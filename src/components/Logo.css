@@ -9,6 +9,13 @@
   width: clamp(160px, 28vw, 480px);
   height: auto;
   overflow: visible;
+  transform: translateX(30%);
+  animation: slide 2s ease-in-out 3.5s forwards;
+}
+
+@keyframes slide {
+  from { transform: translateX(30%); }
+  to { transform: translateX(0); }
 }
 
 .logo-wrap path {
