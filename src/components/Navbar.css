@@ -3,8 +3,6 @@
   flex-direction: column;
 }
 
-/* ── Nav bar ─────────────────────────────────────────────────── */
-
 .navbar {
   display: flex;
   justify-content: flex-end;
@@ -13,39 +11,27 @@
   height: var(--nav-height);
 }
 
-/* ── Hamburger button ─────────────────────────────────────────── */
-
 .hamburger {
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
   color: var(--fg);
-
-  /* Container that clips the SVG — starts narrow, unrolls on hover/active */
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  overflow: hidden;
-
-  /* Collapsed: shows only the rightmost ~54px of the illustration */
-  width: 54px;
-  height: 38px;
-
-  transition: width 0.75s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hamburger:hover,
-.hamburger.is-open {
-  /* Expanded: full cobblestone illustration visible */
-  width: 190px;
+.hamburger svg {
+  width: 120px;
+  height: auto;
+  display: block;
 }
 
-.hamburger-svg {
-  /* Always at full natural size; right-aligned so right edge is always visible */
-  flex-shrink: 0;
-  width: 190px;
-  height: 38px;
+.hamburger path {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 6;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 4s ease forwards;
 }
 
 /* ── Dropdown ─────────────────────────────────────────────────── */
