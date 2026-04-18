@@ -11,3 +11,14 @@
   align-items: center;
   padding: 2rem;
 }
+
+.page-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  color: var(--fg-dim);
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.875rem;
+}

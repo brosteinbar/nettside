@@ -1,23 +1,48 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
+import LoginModal from './LoginModal'
 import hamburgRaw from '../../resources/img/brostein_tegning_svart.svg?raw'
 import './Navbar.css'
 
 const MENU_ITEMS = [
-  { label: 'Om oss', href: '#' },
-  { label: 'Meny', href: '#' },
-  { label: 'Arrangementer', href: '#' },
-  { label: 'Kontakt', href: '#' },
+  { label: 'Om oss',  href: '/' },
+  { label: 'Meny',    href: '/meny' },
+  { label: 'Kontakt', href: '/kontakt' },
 ]
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
+  const headerRef = useRef(null)
+  const { user } = useAuth()
+
+  useEffect(() => {
+    const header    = headerRef.current
+    const hamburger = header?.querySelector('.hamburger')
+    if (!header || !hamburger) return
+    if (window.matchMedia('(pointer: coarse)').matches) return
+
+    const open  = () => setIsOpen(true)
+    const close = () => setIsOpen(false)
+    hamburger.addEventListener('mouseenter', open)
+    header.addEventListener('mouseleave', close)
+    return () => {
+      hamburger.removeEventListener('mouseenter', open)
+      header.removeEventListener('mouseleave', close)
+    }
+  }, [])
+
+  const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+  const close = () => setIsOpen(false)
 
   return (
-    <header className="site-header">
+    <header className="site-header" ref={headerRef}>
       <nav className="navbar">
         <button
           className={`hamburger${isOpen ? ' is-open' : ''}`}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={isTouch ? () => setIsOpen(!isOpen) : undefined}
           aria-label={isOpen ? 'Lukk meny' : 'Åpne meny'}
           aria-expanded={isOpen}
           aria-controls="nav-dropdown"
@@ -34,14 +59,31 @@ export default function Navbar() {
           <ul className="nav-links" role="list">
             {MENU_ITEMS.map((item, i) => (
               <li key={item.label} style={{ '--item-index': i }}>
-                <a href={item.href} onClick={() => setIsOpen(false)}>
-                  {item.label}
-                </a>
+                <Link to={item.href} onClick={close}>{item.label}</Link>
               </li>
             ))}
           </ul>
+          <div className="nav-admin-row">
+            {user ? (
+              <button
+                className="nav-admin-btn"
+                onClick={() => { supabase.auth.signOut(); close() }}
+              >
+                Logg ut
+              </button>
+            ) : (
+              <button
+                className="nav-admin-btn"
+                onClick={() => { setShowLogin(true); close() }}
+              >
+                Admin
+              </button>
+            )}
+          </div>
         </div>
       </div>
+
+      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
     </header>
   )
 }

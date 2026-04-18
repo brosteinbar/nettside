@@ -1,6 +1,7 @@
 .site-header {
-  display: flex;
-  flex-direction: column;
+  height: var(--nav-height);
+  overflow: visible;
+  z-index: 10;
 }
 
 .navbar {
@@ -47,6 +48,7 @@
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.55s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  background: var(--bg);
 }
 
 .nav-dropdown.is-open {
@@ -72,7 +74,7 @@
   text-decoration: none;
   font-family: 'InterDisplay', sans-serif;
   font-weight: 800;
-  font-size: clamp(2.4rem, 7vw, 5.5rem);
+  font-size: clamp(1.4rem, 3.5vw, 2.2rem);
   letter-spacing: -0.035em;
   line-height: 1.05;
 
@@ -92,3 +94,34 @@
 .nav-links li a:hover {
   color: var(--fg-dim);
 }
+
+/* ── Admin row ────────────────────────────────────────────────── */
+
+.nav-admin-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem 2rem 2rem;
+  border-top: 1px solid rgba(10, 9, 8, 0.12);
+  margin-top: 0.5rem;
+
+  opacity: 0;
+  transition: opacity 0.35s ease calc(3 * 55ms + 100ms);
+}
+
+.nav-dropdown.is-open .nav-admin-row {
+  opacity: 1;
+}
+
+.nav-admin-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fg-dim);
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.nav-admin-btn:hover { color: var(--fg); }

@@ -1,0 +1,315 @@
+.menu-page {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 3rem 2rem 6rem;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 4rem;
+}
+
+@media (max-width: 620px) {
+  .menu-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Category ────────────────────────────────────────────────────── */
+
+.menu-category {
+  padding: 2rem 0;
+  border-top: 1px solid var(--fg-dim);
+}
+
+.menu-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.menu-category-name {
+  font-family: 'InterDisplay', sans-serif;
+  font-weight: 800;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.menu-category-dash {
+  font-family: 'InterVariable', sans-serif;
+  font-weight: 300;
+  font-size: 0.75rem;
+  opacity: 0.35;
+}
+
+.cat-drag-handle {
+  position: absolute;
+  left: 0;
+}
+
+.btn-delete-category {
+  position: absolute;
+  right: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fg-dim);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.btn-delete-category:hover { color: var(--fg); }
+
+.category-name-input {
+  background: none;
+  border: none;
+  border-bottom: 1px dashed var(--fg-dim);
+  font-family: 'InterDisplay', sans-serif;
+  font-weight: 800;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--fg);
+  min-width: 80px;
+  width: auto;
+}
+
+.category-name-input:focus { outline: none; }
+
+/* ── Items ───────────────────────────────────────────────────────── */
+
+.menu-items-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.menu-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.menu-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.menu-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.menu-item-name {
+  font-family: 'InterVariable', sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.menu-item-allergens {
+  font-weight: 300;
+  font-size: 0.75rem;
+  color: var(--fg-dim);
+}
+
+.menu-item-price {
+  font-family: 'InterVariable', sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.menu-item-desc {
+  font-family: 'InterVariable', sans-serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 0.8rem;
+  color: var(--fg-dim);
+  line-height: 1.4;
+  margin-top: 0.1rem;
+}
+
+/* ── Admin controls ──────────────────────────────────────────────── */
+
+.drag-handle {
+  background: none;
+  border: none;
+  cursor: grab;
+  padding: 0 0.2rem;
+  color: var(--fg-dim);
+  font-size: 1rem;
+  flex-shrink: 0;
+  touch-action: none;
+  line-height: 1.4;
+}
+
+.drag-handle:active { cursor: grabbing; }
+
+.admin-item-actions {
+  display: flex;
+  gap: 0.2rem;
+  flex-shrink: 0;
+}
+
+.admin-item-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fg-dim);
+  font-size: 0.875rem;
+  padding: 0 0.2rem;
+  line-height: 1.4;
+  transition: color 0.15s;
+}
+
+.admin-item-actions button:hover { color: var(--fg); }
+
+.btn-add-item {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fg-dim);
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.75rem;
+  padding: 0.6rem 0 0;
+  width: 100%;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.btn-add-item:hover { color: var(--fg); }
+
+/* ── Soft-deleted ────────────────────────────────────────────────── */
+
+.deleted-items-section {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(10, 9, 8, 0.04);
+  border-radius: 2px;
+}
+
+.deleted-items-label {
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: 0.5rem;
+}
+
+.menu-item--deleted .menu-item-name,
+.menu-item--deleted .menu-item-price {
+  color: var(--fg-dim);
+  text-decoration: line-through;
+  text-decoration-color: var(--fg-dim);
+}
+
+.btn-hard-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #b94040;
+  font-size: 0.875rem;
+  padding: 0 0.2rem;
+  opacity: 0.6;
+  line-height: 1.4;
+  transition: opacity 0.15s;
+}
+
+.btn-hard-delete:hover { opacity: 1; }
+
+/* ── Edit form ───────────────────────────────────────────────────── */
+
+.edit-item-form {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem;
+  background: rgba(10, 9, 8, 0.04);
+  border-radius: 2px;
+}
+
+.edit-item-form input {
+  background: var(--bg);
+  border: 1px solid rgba(10, 9, 8, 0.2);
+  border-radius: 1px;
+  padding: 0.3rem 0.5rem;
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.875rem;
+  color: var(--fg);
+  width: 100%;
+}
+
+.edit-item-form input::placeholder { color: var(--fg-dim); }
+.edit-item-form input:focus { outline: none; border-color: var(--fg); }
+
+.edit-form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.edit-form-actions button {
+  background: none;
+  border: 1px solid var(--fg-dim);
+  border-radius: 1px;
+  cursor: pointer;
+  padding: 0.25rem 0.75rem;
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.75rem;
+  color: var(--fg);
+  transition: opacity 0.15s;
+}
+
+.edit-form-actions button:first-child {
+  border-color: var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.edit-form-actions button:hover { opacity: 0.75; }
+
+/* ── Add category footer ─────────────────────────────────────────── */
+
+.admin-footer {
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-add-category {
+  background: none;
+  border: 1px dashed var(--fg-dim);
+  border-radius: 1px;
+  cursor: pointer;
+  padding: 0.5rem 1.75rem;
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--fg-dim);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.btn-add-category:hover { color: var(--fg); border-color: var(--fg); }
+
+/* ── Loading ─────────────────────────────────────────────────────── */
+
+.menu-loading {
+  text-align: center;
+  padding: 5rem 2rem;
+  color: var(--fg-dim);
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.875rem;
+}
