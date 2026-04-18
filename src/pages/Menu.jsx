@@ -20,6 +20,13 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import './Menu.css'
 
+function useDndSensors() {
+  return useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+}
+
 function EditItemForm({ item, onSave, onCancel }) {
   const [vals, setVals] = useState({
     name: item?.name ?? '',
@@ -50,7 +57,7 @@ function EditItemForm({ item, onSave, onCancel }) {
   )
 }
 
-function SortableMenuItem({ item, isAdmin, onEdit, onSoftDelete, onHardDelete, isDeleted }) {
+function SortableMenuItem({ item, isAdmin, onEdit, onSoftDelete, onHardDelete, onRestore, isDeleted }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `item-${item.id}`,
     disabled: !isAdmin || isDeleted,
@@ -78,7 +85,10 @@ function SortableMenuItem({ item, isAdmin, onEdit, onSoftDelete, onHardDelete, i
       {isAdmin && (
         <div className="admin-item-actions">
           {isDeleted ? (
-            <button className="btn-hard-delete" onClick={() => onHardDelete(item.id)} title="Slett permanent">✕</button>
+            <>
+              <button className="btn-restore" onClick={() => onRestore(item.id)} title="Gjenopprett">↩</button>
+              <button className="btn-hard-delete" onClick={() => onHardDelete(item.id)} title="Slett permanent">✕</button>
+            </>
           ) : (
             <>
               <button onClick={() => onEdit(item)} title="Rediger">✎</button>
@@ -95,16 +105,26 @@ function SortableCategory({
   category, isAdmin,
   editingItemId, newItemCategoryId,
   onEditItem, onSaveItem, onCancelEdit,
-  onSoftDelete, onHardDelete, onAddItem,
+  onSoftDelete, onHardDelete, onRestore, onAddItem,
   onCategoryNameChange, onCategoryNameBlur, onDeleteCategory,
+  onItemsReorder,
 }) {
+  const sensors = useDndSensors()
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `cat-${category.id}`,
     disabled: !isAdmin,
   })
 
-  const activeItems = category.items.filter(i => !i.deleted_at)
+  const activeItems  = category.items.filter(i => !i.deleted_at)
   const deletedItems = category.items.filter(i => i.deleted_at)
+
+  function handleItemDragEnd({ active, over }) {
+    if (!over || active.id === over.id) return
+    const activeId = String(active.id).replace('item-', '')
+    const overId   = String(over.id).replace('item-', '')
+    onItemsReorder(category.id, activeId, overId)
+  }
 
   return (
     <div
@@ -133,37 +153,40 @@ function SortableCategory({
         )}
       </div>
 
-      <SortableContext items={activeItems.map(i => `item-${i.id}`)} strategy={verticalListSortingStrategy}>
-        <ul className="menu-items-list">
-          {activeItems.map(item =>
-            editingItemId === item.id ? (
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleItemDragEnd}>
+        <SortableContext items={activeItems.map(i => `item-${i.id}`)} strategy={verticalListSortingStrategy}>
+          <ul className="menu-items-list">
+            {activeItems.map(item =>
+              editingItemId === item.id ? (
+                <EditItemForm
+                  key={item.id}
+                  item={item}
+                  onSave={v => onSaveItem(item.id, category.id, v)}
+                  onCancel={onCancelEdit}
+                />
+              ) : (
+                <SortableMenuItem
+                  key={item.id}
+                  item={item}
+                  isAdmin={isAdmin}
+                  onEdit={onEditItem}
+                  onSoftDelete={onSoftDelete}
+                  onHardDelete={onHardDelete}
+                  onRestore={onRestore}
+                  isDeleted={false}
+                />
+              )
+            )}
+            {newItemCategoryId === category.id && (
               <EditItemForm
-                key={item.id}
-                item={item}
-                onSave={v => onSaveItem(item.id, category.id, v)}
+                item={null}
+                onSave={v => onSaveItem('new', category.id, v)}
                 onCancel={onCancelEdit}
               />
-            ) : (
-              <SortableMenuItem
-                key={item.id}
-                item={item}
-                isAdmin={isAdmin}
-                onEdit={onEditItem}
-                onSoftDelete={onSoftDelete}
-                onHardDelete={onHardDelete}
-                isDeleted={false}
-              />
-            )
-          )}
-          {newItemCategoryId === category.id && (
-            <EditItemForm
-              item={null}
-              onSave={v => onSaveItem('new', category.id, v)}
-              onCancel={onCancelEdit}
-            />
-          )}
-        </ul>
-      </SortableContext>
+            )}
+          </ul>
+        </SortableContext>
+      </DndContext>
 
       {isAdmin && (
         <button className="btn-add-item" onClick={() => onAddItem(category.id)}>
@@ -183,6 +206,7 @@ function SortableCategory({
                 onEdit={() => {}}
                 onSoftDelete={() => {}}
                 onHardDelete={onHardDelete}
+                onRestore={onRestore}
                 isDeleted
               />
             ))}
@@ -202,10 +226,7 @@ export default function Menu() {
   const [editingItemId, setEditingItemId] = useState(null)
   const [newItemCategoryId, setNewItemCategoryId] = useState(null)
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  )
+  const sensors = useDndSensors()
 
   const fetchData = useCallback(async () => {
     const [{ data: cats }, { data: items }] = await Promise.all([
@@ -219,32 +240,33 @@ export default function Menu() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  function handleDragEnd({ active, over }) {
+  function handleCategoryDragEnd({ active, over }) {
     if (!over || active.id === over.id) return
     const aId = String(active.id)
     const oId = String(over.id)
+    if (!aId.startsWith('cat-') || !oId.startsWith('cat-')) return
+    const from = categories.findIndex(c => `cat-${c.id}` === aId)
+    const to   = categories.findIndex(c => `cat-${c.id}` === oId)
+    const reordered = arrayMove(categories, from, to)
+    setCategories(reordered)
+    Promise.all(reordered.map((c, i) =>
+      supabase.from('menu_categories').update({ sort_order: i }).eq('id', c.id)
+    ))
+  }
 
-    if (aId.startsWith('cat-') && oId.startsWith('cat-')) {
-      const from = categories.findIndex(c => `cat-${c.id}` === aId)
-      const to   = categories.findIndex(c => `cat-${c.id}` === oId)
-      const reordered = arrayMove(categories, from, to)
-      setCategories(reordered)
-      reordered.forEach((c, i) =>
-        supabase.from('menu_categories').update({ sort_order: i }).eq('id', c.id)
-      )
-    } else if (aId.startsWith('item-') && oId.startsWith('item-')) {
-      const activeId = aId.replace('item-', '')
-      const overId   = oId.replace('item-', '')
-      const cat = categories.find(c => c.items.some(i => i.id === activeId))
-      if (!cat) return
-      const from = cat.items.findIndex(i => i.id === activeId)
-      const to   = cat.items.findIndex(i => i.id === overId)
-      const reorderedItems = arrayMove(cat.items, from, to)
-      setCategories(prev => prev.map(c => c.id === cat.id ? { ...c, items: reorderedItems } : c))
-      reorderedItems.forEach((item, i) =>
-        supabase.from('menu_items').update({ sort_order: i }).eq('id', item.id)
-      )
-    }
+  function handleItemsReorder(catId, activeId, overId) {
+    const cat = categories.find(c => c.id === catId)
+    if (!cat) return
+    const activeItems  = cat.items.filter(i => !i.deleted_at)
+    const deletedItems = cat.items.filter(i => i.deleted_at)
+    const from = activeItems.findIndex(i => i.id === activeId)
+    const to   = activeItems.findIndex(i => i.id === overId)
+    if (from === -1 || to === -1) return
+    const reordered = arrayMove(activeItems, from, to)
+    setCategories(prev => prev.map(c => c.id === catId ? { ...c, items: [...reordered, ...deletedItems] } : c))
+    Promise.all(reordered.map((item, i) =>
+      supabase.from('menu_items').update({ sort_order: i }).eq('id', item.id)
+    ))
   }
 
   async function handleSaveItem(itemId, catId, vals) {
@@ -281,6 +303,14 @@ export default function Menu() {
     setCategories(prev => prev.map(c => ({
       ...c,
       items: c.items.map(i => i.id === itemId ? { ...i, deleted_at: now } : i),
+    })))
+  }
+
+  async function handleRestore(itemId) {
+    await supabase.from('menu_items').update({ deleted_at: null }).eq('id', itemId)
+    setCategories(prev => prev.map(c => ({
+      ...c,
+      items: c.items.map(i => i.id === itemId ? { ...i, deleted_at: null } : i),
     })))
   }
 
@@ -324,7 +354,7 @@ export default function Menu() {
 
   return (
     <div className="menu-page">
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
         <SortableContext items={categories.map(c => `cat-${c.id}`)} strategy={rectSortingStrategy}>
           <div className="menu-grid">
             {categories.map(cat => (
@@ -339,10 +369,12 @@ export default function Menu() {
                 onCancelEdit={handleCancelEdit}
                 onSoftDelete={handleSoftDelete}
                 onHardDelete={handleHardDelete}
+                onRestore={handleRestore}
                 onAddItem={handleAddItem}
                 onCategoryNameChange={handleCategoryNameChange}
                 onCategoryNameBlur={handleCategoryNameBlur}
                 onDeleteCategory={handleDeleteCategory}
+                onItemsReorder={handleItemsReorder}
               />
             ))}
           </div>
