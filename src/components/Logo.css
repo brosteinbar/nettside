@@ -19,20 +19,27 @@
 }
 
 .logo-wrap path {
-  fill: none;
+  fill: var(--fg);
+  fill-opacity: 0;
   stroke: var(--fg);
   stroke-width: 6;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: draw 4s ease forwards;
+  animation: draw 4s ease forwards, morph 0.8s ease forwards;
 }
 
 /* defs is child 1, so paths are children 2–5 */
-.logo-wrap path:nth-child(2) { animation-delay: 0s; }
-.logo-wrap path:nth-child(3) { animation-delay: 4s; }
-.logo-wrap path:nth-child(4) { animation-delay: 4s; }
-.logo-wrap path:nth-child(5) { animation-delay: 4s; }
+/* second delay value = when morph starts (right after that path finishes drawing) */
+.logo-wrap path:nth-child(2) { animation-delay: 0s, 8s; }
+.logo-wrap path:nth-child(3) { animation-delay: 4s, 8s; }
+.logo-wrap path:nth-child(4) { animation-delay: 4s, 8s; }
+.logo-wrap path:nth-child(5) { animation-delay: 4s, 8s; }
 
 @keyframes draw {
   to { stroke-dashoffset: 0; }
+}
+
+@keyframes morph {
+  from { fill-opacity: 0; stroke-width: 6; stroke-opacity: 1; }
+  to   { fill-opacity: 1; stroke-width: 0; stroke-opacity: 0; }
 }

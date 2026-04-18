@@ -26,12 +26,18 @@
 }
 
 .hamburger path {
-  fill: none;
+  fill: var(--fg);
+  fill-opacity: 0;
   stroke: var(--fg);
   stroke-width: 6;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: draw 4s ease forwards;
+  animation: draw 4s ease forwards, morph 0.8s ease forwards 4s;
+}
+
+@keyframes morph {
+  from { fill-opacity: 0; stroke-width: 6; stroke-opacity: 1; }
+  to   { fill-opacity: 1; stroke-width: 0; stroke-opacity: 0; }
 }
 
 /* ── Dropdown ─────────────────────────────────────────────────── */
