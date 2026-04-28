@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Fragment } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import './Arrangement.css'
@@ -29,6 +29,28 @@ function formatDate(dateStr) {
   if (!dateStr) return ''
   const [year, month, day] = dateStr.split('-').map(Number)
   return `${day}. ${MONTHS_NO[month - 1]} ${year}`
+}
+
+function getWeekMonday(dateStr) {
+  const [year, month, day] = dateStr.split('-').map(Number)
+  const d = new Date(year, month - 1, day)
+  const dow = (d.getDay() + 6) % 7
+  d.setDate(d.getDate() - dow)
+  return d
+}
+
+function getWeekKey(dateStr) {
+  if (!dateStr) return ''
+  const m = getWeekMonday(dateStr)
+  return `${m.getFullYear()}-${m.getMonth()}-${m.getDate()}`
+}
+
+function getWeekLabel(dateStr) {
+  const monday = getWeekMonday(dateStr)
+  const sunday = new Date(monday)
+  sunday.setDate(monday.getDate() + 6)
+  const fmt = dt => `${dt.getDate()}. ${MONTHS_NO[dt.getMonth()].slice(0, 3)}`
+  return `${fmt(monday)} – ${fmt(sunday)}`
 }
 
 function formatVirtualDate(dateStr) {
@@ -145,7 +167,7 @@ function EventForm({ event, onSave, onCancel }) {
   )
 }
 
-function EventCard({ event, isAdmin, onEdit, onDelete, isPast }) {
+function EventCard({ event, isAdmin, onEdit, onDelete, isPast, isWeekEnd }) {
   const timeRange = formatTime(event.start_time) +
     (event.end_time ? `–${formatTime(event.end_time)}` : '')
   const when = event._virtualDate
@@ -153,7 +175,7 @@ function EventCard({ event, isAdmin, onEdit, onDelete, isPast }) {
     : formatDate(event.date)
 
   return (
-    <div className={`event-card${isPast ? ' event-card--past' : ''}`}>
+    <div className={`event-card${isPast ? ' event-card--past' : ''}${isWeekEnd ? ' event-card--week-end' : ''}`}>
       <div className="event-card-when">{when}, {timeRange}</div>
       <div className="event-card-title">{event.title}</div>
       {event.description && <div className="event-card-desc">{event.description}</div>}
@@ -213,29 +235,40 @@ export default function Arrangement() {
         <p className="arrangement-empty">Ingen kommende arrangementer.</p>
       )}
       <div className="arrangement-list">
-        {expandedEvents.map(event => {
+        {expandedEvents.map((event, i) => {
           const key = event._virtualDate ? `${event.id}-${event._virtualDate}` : String(event.id)
+          const eventDate = event._virtualDate ?? event.date ?? ''
+          const prevDate = i > 0 ? (expandedEvents[i - 1]._virtualDate ?? expandedEvents[i - 1].date ?? '') : null
+          const showDivider = i > 0 && getWeekKey(eventDate) !== getWeekKey(prevDate ?? '')
+          const nextDate = i < expandedEvents.length - 1 ? (expandedEvents[i + 1]._virtualDate ?? expandedEvents[i + 1].date ?? '') : null
+          const isWeekEnd = !nextDate || getWeekKey(eventDate) !== getWeekKey(nextDate)
+
           if (editingId === event.id) {
             if (editFormShown) return null
             editFormShown = true
             return (
-              <EventForm
-                key={key}
-                event={event}
-                onSave={vals => handleUpdate(event.id, vals)}
-                onCancel={() => setEditingId(null)}
-              />
+              <Fragment key={key}>
+                {showDivider && <div className="week-divider">{getWeekLabel(eventDate)}</div>}
+                <EventForm
+                  event={event}
+                  onSave={vals => handleUpdate(event.id, vals)}
+                  onCancel={() => setEditingId(null)}
+                />
+              </Fragment>
             )
           }
           return (
-            <EventCard
-              key={key}
-              event={event}
-              isAdmin={isAdmin}
-              onEdit={e => { setShowNewForm(false); setEditingId(e.id) }}
-              onDelete={handleDelete}
-              isPast={!event._virtualDate && event.date < today}
-            />
+            <Fragment key={key}>
+              {showDivider && <div className="week-divider">{getWeekLabel(eventDate)}</div>}
+              <EventCard
+                event={event}
+                isAdmin={isAdmin}
+                onEdit={e => { setShowNewForm(false); setEditingId(e.id) }}
+                onDelete={handleDelete}
+                isPast={!event._virtualDate && event.date < today}
+                isWeekEnd={isWeekEnd}
+              />
+            </Fragment>
           )
         })}
         {showNewForm && (
