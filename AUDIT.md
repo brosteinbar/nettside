@@ -17,11 +17,11 @@
 - [x] **Error text** — `.modal-error` and `.admin-error` removed; all error text now uses shared `.form-error` in `index.css`
 
 ### JavaScript
-- [ ] **Login form logic** — LoginModal.jsx and Admin.jsx each contain ~40 lines of identical state (`email`, `password`, `error`, `loading`) and `handleSubmit`. Extract to a `useLoginForm()` custom hook
-- [ ] **Login form markup** — LoginModal.jsx and Admin.jsx have identical 25-line form JSX. Extract to a shared `<LoginForm>` component
+- [x] **Login form logic** — Extracted to `src/hooks/useLoginForm.js`; accepts `onSuccess` callback for the differing post-login action
+- [x] **Login form markup** — Extracted to `src/components/LoginForm.jsx`; accepts `formClassName` and `submitClassName` props (defaults to modal variants)
 
 ### HTML/JSX
-- [ ] **Button classes** — `.modal-submit`, `.admin-submit`, `.event-form-actions button`, `.edit-form-actions button` are scattered with near-identical styles but no shared component. Create a unified `<Button>` component or shared CSS class
+- [x] **Button classes** — `.modal-submit` and `.admin-submit` consolidated in `index.css`. `event-form-actions` and `edit-form-actions` buttons are intentionally different — no consolidation needed
 
 ---
 
