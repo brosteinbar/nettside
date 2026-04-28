@@ -1,8 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
-import { useAuth } from '../context/AuthContext'
-import LoginModal from './LoginModal'
 import hamburgRaw from '../../resources/img/brostein_tegning_svart.svg?raw'
 import './Navbar.css'
 
@@ -14,9 +11,7 @@ const MENU_ITEMS = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
-  const [showLogin, setShowLogin] = useState(false)
   const headerRef = useRef(null)
-  const { user } = useAuth()
 
   useEffect(() => {
     const header    = headerRef.current
@@ -63,27 +58,8 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
-          <div className="nav-admin-row">
-            {user ? (
-              <button
-                className="nav-admin-btn"
-                onClick={() => { supabase.auth.signOut(); close() }}
-              >
-                Logg ut
-              </button>
-            ) : (
-              <button
-                className="nav-admin-btn"
-                onClick={() => { setShowLogin(true); close() }}
-              >
-                Admin
-              </button>
-            )}
-          </div>
         </div>
       </div>
-
-      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
     </header>
   )
 }

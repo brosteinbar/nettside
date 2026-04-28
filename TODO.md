@@ -24,5 +24,10 @@
 - [ ] "Om oss" is currently the only nav link back to the landing page — rename it (e.g. "Hjem") rather than removing it
 
 ### 4. Fix hamburger menu fonts
-- [ ] Font weight too bulky — reduce weight
-- [ ] Add hover effects: italic on hover (possibly other effects)
+- [x] Font weight too bulky — reduce weight
+- [x] Add hover effects: italic on hover
+
+### 5. Move admin login to `/admin` route
+- [ ] Remove "Admin"/"Logg ut" button from hamburger menu
+- [ ] Create `/#/admin` route with a standalone login page
+- [ ] Redirect to menu (or a dashboard) after successful login

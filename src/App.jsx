@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Menu from './pages/Menu'
 import Kontakt from './pages/Kontakt'
+import Admin from './pages/Admin'
 import './App.css'
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/meny" element={<Menu />} />
             <Route path="/kontakt" element={<Kontakt />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </div>
       </HashRouter>

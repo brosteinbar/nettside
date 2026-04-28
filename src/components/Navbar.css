@@ -98,33 +98,3 @@
   font-style: italic;
 }
 
-/* ── Admin row ────────────────────────────────────────────────── */
-
-.nav-admin-row {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.75rem 2rem 2rem;
-  border-top: 1px solid rgba(10, 9, 8, 0.12);
-  margin-top: 0.5rem;
-
-  opacity: 0;
-  transition: opacity 0.35s ease calc(3 * 55ms + 100ms);
-}
-
-.nav-dropdown.is-open .nav-admin-row {
-  opacity: 1;
-}
-
-.nav-admin-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--fg-dim);
-  font-family: 'InterVariable', sans-serif;
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  padding: 0;
-  transition: color 0.2s ease;
-}
-
-.nav-admin-btn:hover { color: var(--fg); }
