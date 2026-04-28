@@ -33,5 +33,7 @@
 - [x] Redirect to menu (or a dashboard) after successful login
 
 ### 6. Navbar overlay pushes page content down
-- [ ] When the hamburger menu opens, the dropdown expands and pushes page content down instead of overlaying it
-- [ ] Especially problematic on the menu page — fix so the dropdown floats over content
+- [x] Dropdown now floats as right-aligned overlay, doesn't affect page layout
+
+### 7. Sign-out in hamburger menu when logged in
+- [ ] When authenticated, show a "Logg ut" option in the hamburger menu (like before, but without the "Admin" login button for logged-out users)
