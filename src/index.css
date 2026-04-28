@@ -98,3 +98,68 @@ body {
 #root {
   height: 100%;
 }
+
+/* ── Shared form styles ───────────────────────────────────────── */
+
+.modal-form,
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.modal-form input,
+.admin-form input,
+.event-form input,
+.event-form select,
+.event-form textarea {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--fg-dim);
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.875rem;
+  color: var(--fg);
+  width: 100%;
+  transition: border-color 0.15s;
+}
+
+.modal-form input:focus,
+.admin-form input:focus,
+.event-form input:focus,
+.event-form select:focus,
+.event-form textarea:focus {
+  outline: none;
+  border-bottom-color: var(--fg);
+}
+
+.modal-form input::placeholder,
+.admin-form input::placeholder,
+.event-form input::placeholder,
+.event-form textarea::placeholder {
+  color: var(--fg-dim);
+}
+
+.form-error {
+  font-size: 0.8rem;
+  color: #b94040;
+}
+
+.modal-submit,
+.admin-submit {
+  margin-top: 0.5rem;
+  background: var(--fg);
+  color: var(--bg);
+  border: none;
+  cursor: pointer;
+  padding: 0.75rem;
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  transition: opacity 0.15s;
+}
+
+.modal-submit:hover,
+.admin-submit:hover { opacity: 0.82; }
+
+.modal-submit:disabled,
+.admin-submit:disabled { opacity: 0.45; cursor: not-allowed; }

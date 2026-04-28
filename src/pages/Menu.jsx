@@ -52,13 +52,13 @@ function EditItemForm({ item, onSave, onCancel }) {
   return (
     <li className="edit-item-form">
       <input placeholder="Navn *" value={vals.name} onChange={set('name')} autoFocus />
-      {errors.name && <span style={{ color: '#b94040', fontSize: '0.8rem' }}>{errors.name}</span>}
+      {errors.name && <span className="form-error">{errors.name}</span>}
       <input placeholder="Beskrivelse" value={vals.description} onChange={set('description')} />
-      {errors.description && <span style={{ color: '#b94040', fontSize: '0.8rem' }}>{errors.description}</span>}
+      {errors.description && <span className="form-error">{errors.description}</span>}
       <input placeholder="Allergener (f, m, g…)" value={vals.allergens} onChange={set('allergens')} />
-      {errors.allergens && <span style={{ color: '#b94040', fontSize: '0.8rem' }}>{errors.allergens}</span>}
+      {errors.allergens && <span className="form-error">{errors.allergens}</span>}
       <input placeholder="Pris" type="number" value={vals.price} onChange={set('price')} />
-      {errors.price && <span style={{ color: '#b94040', fontSize: '0.8rem' }}>{errors.price}</span>}
+      {errors.price && <span className="form-error">{errors.price}</span>}
       <div className="edit-form-actions">
         <button onClick={handleSave}>Lagre</button>
         <button onClick={onCancel}>Avbryt</button>

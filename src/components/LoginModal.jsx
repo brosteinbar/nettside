@@ -42,7 +42,7 @@ export default function LoginModal({ onClose }) {
             onChange={e => setPassword(e.target.value)}
             required
           />
-          {error && <div className="modal-error">{error}</div>}
+          {error && <div className="form-error">{error}</div>}
           <button type="submit" className="modal-submit" disabled={loading}>
             {loading ? 'Logger inn…' : 'Logg inn'}
           </button>

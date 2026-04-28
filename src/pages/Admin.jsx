@@ -61,7 +61,7 @@ export default function Admin() {
             onChange={e => setPassword(e.target.value)}
             required
           />
-          {error && <div className="admin-error">{error}</div>}
+          {error && <div className="form-error">{error}</div>}
           <button type="submit" className="admin-submit" disabled={loading}>
             {loading ? 'Logger inn…' : 'Logg inn'}
           </button>

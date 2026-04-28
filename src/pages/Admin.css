@@ -17,48 +17,9 @@
   margin-bottom: 2rem;
 }
 
-.admin-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-}
+.admin-form input { padding: 0.5rem 0; }
 
-.admin-form input {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--fg-dim);
-  padding: 0.5rem 0;
-  font-family: 'InterVariable', sans-serif;
-  font-size: 0.875rem;
-  color: var(--fg);
-  width: 100%;
-  transition: border-color 0.15s;
-}
-
-.admin-form input::placeholder { color: var(--fg-dim); }
-.admin-form input:focus { outline: none; border-bottom-color: var(--fg); }
-
-.admin-error {
-  font-size: 0.8rem;
-  color: #b94040;
-}
-
-.admin-submit {
-  margin-top: 0.5rem;
-  background: var(--fg);
-  color: var(--bg);
-  border: none;
-  cursor: pointer;
-  padding: 0.75rem;
-  font-family: 'InterVariable', sans-serif;
-  font-size: 0.875rem;
-  letter-spacing: 0.04em;
-  transition: opacity 0.15s;
-  width: 100%;
-}
-
-.admin-submit:hover { opacity: 0.82; }
-.admin-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+.admin-submit { width: 100%; }
 
 .admin-logged-in {
   font-size: 0.875rem;

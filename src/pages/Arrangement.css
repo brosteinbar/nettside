@@ -122,28 +122,9 @@
 
 .event-form input,
 .event-form select,
-.event-form textarea {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--fg-dim);
-  padding: 0.4rem 0;
-  font-family: 'InterVariable', sans-serif;
-  font-size: 0.875rem;
-  color: var(--fg);
-  width: 100%;
-  transition: border-color 0.15s;
-  resize: none;
-}
+.event-form textarea { padding: 0.4rem 0; }
 
-.event-form input:focus,
-.event-form select:focus,
-.event-form textarea:focus {
-  outline: none;
-  border-bottom-color: var(--fg);
-}
-
-.event-form input::placeholder,
-.event-form textarea::placeholder { color: var(--fg-dim); }
+.event-form textarea { resize: none; }
 
 .event-form-title {
   font-family: 'InterDisplay', sans-serif !important;

@@ -11,10 +11,10 @@
 ## Duplicate Code
 
 ### CSS
-- [ ] **Form inputs** — `.modal-form input`, `.admin-form input`, `.event-form input/select/textarea` all duplicate `border-bottom`, `padding`, and `font-family`. Extract to a shared `.form-input` base class in `index.css`
-- [ ] **Button hover transitions** — `opacity: 0.15s` transition + `:hover` styles repeated ~8 times across LoginModal.css, Admin.css, Arrangement.css, Menu.css. Extract to a shared `.btn` class
-- [ ] **Modal/box containers** — `.modal-box` (LoginModal.css) and `.admin-box` (Admin.css) are identically styled (width, padding, border). Consolidate into one shared class
-- [ ] **Error text** — `.modal-error` and `.admin-error` both declare identical `color: #b94040`. Consolidate into one shared `.form-error` class
+- [x] **Form inputs** — Shared base styles moved to `index.css` (background, border, font, color, transition). Component CSS files keep only their unique `padding` value. `.modal-form` and `.admin-form` flex container styles also consolidated
+- [x] **Button hover transitions** — `.modal-submit` and `.admin-submit` consolidated into `index.css`; `admin-submit` retains only `width: 100%` override. Other button styles (event-form-actions, edit-form-actions) are intentionally different — no consolidation needed
+- [x] **Modal/box containers** — `.modal-box` and `.admin-box` are NOT identical (admin-box is only `width`); audit was a false positive
+- [x] **Error text** — `.modal-error` and `.admin-error` removed; all error text now uses shared `.form-error` in `index.css`
 
 ### JavaScript
 - [ ] **Login form logic** — LoginModal.jsx and Admin.jsx each contain ~40 lines of identical state (`email`, `password`, `error`, `loading`) and `handleSubmit`. Extract to a `useLoginForm()` custom hook
