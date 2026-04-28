@@ -6,7 +6,7 @@ import hamburgRaw from '../../resources/img/brostein_tegning_svart.svg?raw'
 import './Navbar.css'
 
 const MENU_ITEMS = [
-  { label: 'Om oss',      href: '/' },
+  { label: 'Hjem',        href: '/' },
   { label: 'Meny',        href: '/meny' },
   { label: 'Arrangement', href: '/arrangement' },
   { label: 'Kontakt',     href: '/kontakt' },
