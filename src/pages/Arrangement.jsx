@@ -124,6 +124,7 @@ function EventForm({ event, onSave, onCancel }) {
       <input
         className="event-form-title"
         placeholder="Tittel *"
+        aria-label="Tittel"
         value={vals.title}
         onChange={set('title')}
         autoFocus
@@ -131,6 +132,7 @@ function EventForm({ event, onSave, onCancel }) {
       <textarea
         className="event-form-desc"
         placeholder="Beskrivelse"
+        aria-label="Beskrivelse"
         value={vals.description}
         onChange={set('description')}
         rows={2}
@@ -146,18 +148,18 @@ function EventForm({ event, onSave, onCancel }) {
         </label>
       </div>
       {vals.type === 'one-time' ? (
-        <input type="date" value={vals.date} onChange={set('date')} />
+        <input type="date" aria-label="Dato" value={vals.date} onChange={set('date')} />
       ) : (
-        <select value={vals.day} onChange={set('day')}>
+        <select aria-label="Ukedag" value={vals.day} onChange={set('day')}>
           {DAY_OPTIONS.map(o => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
       )}
       <div className="event-form-times">
-        <input type="time" value={vals.start_time} onChange={set('start_time')} />
+        <input type="time" aria-label="Starttid" value={vals.start_time} onChange={set('start_time')} />
         <span>–</span>
-        <input type="time" value={vals.end_time} onChange={set('end_time')} />
+        <input type="time" aria-label="Sluttid" value={vals.end_time} onChange={set('end_time')} />
       </div>
       <div className="event-form-actions">
         <button onClick={handleSave}>Lagre</button>
@@ -181,8 +183,8 @@ function EventCard({ event, isAdmin, onEdit, onDelete, isPast, isWeekEnd }) {
       {event.description && <div className="event-card-desc">{event.description}</div>}
       {isAdmin && (
         <div className="event-card-actions">
-          <button onClick={() => onEdit(event)} title="Rediger">✎</button>
-          <button onClick={() => onDelete(event.id)} title="Slett">×</button>
+          <button onClick={() => onEdit(event)} title="Rediger" aria-label="Rediger arrangement">✎</button>
+          <button onClick={() => onDelete(event.id)} title="Slett" aria-label="Slett arrangement">×</button>
         </div>
       )}
     </div>

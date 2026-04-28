@@ -5,7 +5,7 @@ export default function LoginModal({ onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>×</button>
+        <button className="modal-close" onClick={onClose} aria-label="Lukk">×</button>
         <h2 className="modal-title">Innlogging</h2>
         <LoginForm onSuccess={onClose} />
       </div>

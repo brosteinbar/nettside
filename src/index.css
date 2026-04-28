@@ -80,7 +80,13 @@
   --fg: #0a0908;
   --fg-dim: rgba(10, 9, 8, 0.38);
   --accent: #7a6e5f;
+  --error: #b94040;
   --nav-height: 76px;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
 }
 
 html, body {
@@ -141,7 +147,7 @@ body {
 
 .form-error {
   font-size: 0.8rem;
-  color: #b94040;
+  color: var(--error);
 }
 
 .modal-submit,

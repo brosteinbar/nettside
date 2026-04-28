@@ -233,7 +233,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #b94040;
+  color: var(--error);
   font-size: 0.875rem;
   padding: 0 0.2rem;
   opacity: 0.6;

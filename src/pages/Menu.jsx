@@ -54,13 +54,13 @@ function EditItemForm({ item, onSave, onCancel }) {
 
   return (
     <li className="edit-item-form">
-      <input placeholder="Navn *" value={vals.name} onChange={set('name')} autoFocus />
+      <input placeholder="Navn *" aria-label="Navn" value={vals.name} onChange={set('name')} autoFocus />
       {errors.name && <span className="form-error">{errors.name}</span>}
-      <input placeholder="Beskrivelse" value={vals.description} onChange={set('description')} />
+      <input placeholder="Beskrivelse" aria-label="Beskrivelse" value={vals.description} onChange={set('description')} />
       {errors.description && <span className="form-error">{errors.description}</span>}
-      <input placeholder="Allergener (f, m, g…)" value={vals.allergens} onChange={set('allergens')} />
+      <input placeholder="Allergener (f, m, g…)" aria-label="Allergener" value={vals.allergens} onChange={set('allergens')} />
       {errors.allergens && <span className="form-error">{errors.allergens}</span>}
-      <input placeholder="Pris" type="number" value={vals.price} onChange={set('price')} />
+      <input placeholder="Pris" aria-label="Pris" type="number" value={vals.price} onChange={set('price')} />
       {errors.price && <span className="form-error">{errors.price}</span>}
       <div className="edit-form-actions">
         <button onClick={handleSave}>Lagre</button>
@@ -84,7 +84,7 @@ function SortableMenuItem({ item, isDeleted }) {
       className={`menu-item${isDeleted ? ' menu-item--deleted' : ''}`}
     >
       {isAdmin && !isDeleted && (
-        <button className="drag-handle" {...attributes} {...listeners} tabIndex={-1}>⠿</button>
+        <button className="drag-handle" {...attributes} {...listeners} aria-label="Flytt rett">⠿</button>
       )}
       <div className="menu-item-body">
         <div className="menu-item-row">
@@ -100,13 +100,13 @@ function SortableMenuItem({ item, isDeleted }) {
         <div className="admin-item-actions">
           {isDeleted ? (
             <>
-              <button className="btn-restore" onClick={() => onRestore(item.id)} title="Gjenopprett">↩</button>
-              <button className="btn-hard-delete" onClick={() => onHardDelete(item.id)} title="Slett permanent">✕</button>
+              <button className="btn-restore" onClick={() => onRestore(item.id)} title="Gjenopprett" aria-label="Gjenopprett rett">↩</button>
+              <button className="btn-hard-delete" onClick={() => onHardDelete(item.id)} title="Slett permanent" aria-label="Slett rett permanent">✕</button>
             </>
           ) : (
             <>
-              <button onClick={() => onEditItem(item)} title="Rediger">✎</button>
-              <button onClick={() => onSoftDelete(item.id)} title="Slett">×</button>
+              <button onClick={() => onEditItem(item)} title="Rediger" aria-label="Rediger rett">✎</button>
+              <button onClick={() => onSoftDelete(item.id)} title="Slett" aria-label="Slett rett">×</button>
             </>
           )}
         </div>
@@ -147,12 +147,13 @@ function SortableCategory({ category }) {
     >
       <div className="menu-category-header">
         {isAdmin && (
-          <button className="drag-handle cat-drag-handle" {...attributes} {...listeners} tabIndex={-1}>⠿</button>
+          <button className="drag-handle cat-drag-handle" {...attributes} {...listeners} aria-label="Flytt kategori">⠿</button>
         )}
         <span className="menu-category-dash">— </span>
         {isAdmin ? (
           <input
             className="category-name-input"
+            aria-label="Kategorinavn"
             value={category.name}
             onChange={e => onCategoryNameChange(category.id, e.target.value)}
             onBlur={e => onCategoryNameBlur(category.id, e.target.value)}
@@ -162,7 +163,7 @@ function SortableCategory({ category }) {
         )}
         <span className="menu-category-dash"> —</span>
         {isAdmin && (
-          <button className="btn-delete-category" onClick={() => onDeleteCategory(category.id)} title="Slett kategori">×</button>
+          <button className="btn-delete-category" onClick={() => onDeleteCategory(category.id)} title="Slett kategori" aria-label="Slett kategori">×</button>
         )}
       </div>
 
