@@ -43,6 +43,6 @@
 
 ## Overcomplicated Processes
 
-- [ ] **Menu.jsx — prop drilling** — `SortableCategory` receives 13+ props (`onEdit`, `onSave`, `onCancel`, `onSoftDelete`, `onHardDelete`, `onRestore`, `onAddItem`, `onCategoryNameChange`, `onCategoryNameBlur`, `onDeleteCategory`, `onItemsReorder`, …). Refactor to a context + reducer pattern scoped to the menu editor
-- [ ] **Menu.jsx — race condition** — `handleCategoryNameChange` updates state immediately while `handleCategoryNameBlur` makes an async DB call, creating an inconsistency window. Debounce or consolidate into a single save action
-- [ ] **CSS `!important`** — Menu.css uses `!important` 3 times in `.event-form-title` and `.event-form-desc`. Increase specificity instead or restructure the selectors so `!important` is not needed
+- [x] **Menu.jsx — prop drilling** — Introduced `MenuAdminContext`; `SortableCategory` and `SortableMenuItem` now read all handlers from context instead of props. `SortableCategory` reduced from 13 props to 1 (`category`)
+- [x] **Menu.jsx — race condition** — `onCategoryNameBlur` now receives `e.target.value` directly from the DOM event instead of reading `category.name` from React state, eliminating the inconsistency window
+- [x] **CSS `!important`** — `.event-form-title` rule replaced with `.event-form input.event-form-title` (specificity 0,2,1 beats 0,1,1); all three `!important` flags removed

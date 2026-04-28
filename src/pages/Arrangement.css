@@ -126,10 +126,10 @@
 
 .event-form textarea { resize: none; }
 
-.event-form-title {
-  font-family: 'InterDisplay', sans-serif !important;
-  font-weight: 300 !important;
-  font-size: 1.2rem !important;
+.event-form input.event-form-title {
+  font-family: 'InterDisplay', sans-serif;
+  font-weight: 300;
+  font-size: 1.2rem;
 }
 
 .event-form-type {

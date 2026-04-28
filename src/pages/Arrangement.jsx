@@ -236,9 +236,7 @@ export default function Arrangement() {
 
   return (
     <div className="arrangement-page">
-      {mutationError && (
-        <p style={{ color: '#b94040', textAlign: 'center', padding: '0.5rem 0' }}>{mutationError}</p>
-      )}
+      {mutationError && <p className="form-error" style={{ textAlign: 'center', padding: '0.5rem 0' }}>{mutationError}</p>}
       {expandedEvents.length === 0 && !showNewForm && (
         <p className="arrangement-empty">Ingen kommende arrangementer.</p>
       )}

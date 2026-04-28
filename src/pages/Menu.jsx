@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, createContext, useContext } from 'react'
 import {
   DndContext,
   closestCenter,
@@ -19,6 +19,9 @@ import { CSS } from '@dnd-kit/utilities'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import './Menu.css'
+
+const MenuAdminContext = createContext(null)
+const useMenuAdmin = () => useContext(MenuAdminContext)
 
 function useDndSensors() {
   return useSensors(
@@ -67,7 +70,8 @@ function EditItemForm({ item, onSave, onCancel }) {
   )
 }
 
-function SortableMenuItem({ item, isAdmin, onEdit, onSoftDelete, onHardDelete, onRestore, isDeleted }) {
+function SortableMenuItem({ item, isDeleted }) {
+  const { isAdmin, onEditItem, onSoftDelete, onHardDelete, onRestore } = useMenuAdmin()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `item-${item.id}`,
     disabled: !isAdmin || isDeleted,
@@ -101,7 +105,7 @@ function SortableMenuItem({ item, isAdmin, onEdit, onSoftDelete, onHardDelete, o
             </>
           ) : (
             <>
-              <button onClick={() => onEdit(item)} title="Rediger">✎</button>
+              <button onClick={() => onEditItem(item)} title="Rediger">✎</button>
               <button onClick={() => onSoftDelete(item.id)} title="Slett">×</button>
             </>
           )}
@@ -111,14 +115,13 @@ function SortableMenuItem({ item, isAdmin, onEdit, onSoftDelete, onHardDelete, o
   )
 }
 
-function SortableCategory({
-  category, isAdmin,
-  editingItemId, newItemCategoryId,
-  onEditItem, onSaveItem, onCancelEdit,
-  onSoftDelete, onHardDelete, onRestore, onAddItem,
-  onCategoryNameChange, onCategoryNameBlur, onDeleteCategory,
-  onItemsReorder,
-}) {
+function SortableCategory({ category }) {
+  const {
+    isAdmin, editingItemId, newItemCategoryId,
+    onSaveItem, onCancelEdit, onAddItem,
+    onCategoryNameChange, onCategoryNameBlur,
+    onDeleteCategory, onItemsReorder,
+  } = useMenuAdmin()
   const sensors = useDndSensors()
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -152,7 +155,7 @@ function SortableCategory({
             className="category-name-input"
             value={category.name}
             onChange={e => onCategoryNameChange(category.id, e.target.value)}
-            onBlur={() => onCategoryNameBlur(category.id, category.name)}
+            onBlur={e => onCategoryNameBlur(category.id, e.target.value)}
           />
         ) : (
           <span className="menu-category-name">{category.name}</span>
@@ -175,16 +178,7 @@ function SortableCategory({
                   onCancel={onCancelEdit}
                 />
               ) : (
-                <SortableMenuItem
-                  key={item.id}
-                  item={item}
-                  isAdmin={isAdmin}
-                  onEdit={onEditItem}
-                  onSoftDelete={onSoftDelete}
-                  onHardDelete={onHardDelete}
-                  onRestore={onRestore}
-                  isDeleted={false}
-                />
+                <SortableMenuItem key={item.id} item={item} isDeleted={false} />
               )
             )}
             {newItemCategoryId === category.id && (
@@ -209,16 +203,7 @@ function SortableCategory({
           <div className="deleted-items-label">Slettede</div>
           <ul className="menu-items-list">
             {deletedItems.map(item => (
-              <SortableMenuItem
-                key={item.id}
-                item={item}
-                isAdmin={isAdmin}
-                onEdit={() => {}}
-                onSoftDelete={() => {}}
-                onHardDelete={onHardDelete}
-                onRestore={onRestore}
-                isDeleted
-              />
+              <SortableMenuItem key={item.id} item={item} isDeleted />
             ))}
           </ul>
         </div>
@@ -361,6 +346,11 @@ export default function Menu() {
     if (error) setMutationError('Kunne ikke lagre kategorinavn.')
   }
 
+  function handleEditItem(item) {
+    setNewItemCategoryId(null)
+    setEditingItemId(item.id)
+  }
+
   function handleAddItem(catId) {
     setEditingItemId(null)
     setNewItemCategoryId(catId)
@@ -373,45 +363,45 @@ export default function Menu() {
 
   if (loading) return <div className="menu-loading">Laster meny…</div>
 
-  return (
-    <div className="menu-page">
-      {mutationError && (
-        <p style={{ color: '#b94040', textAlign: 'center', padding: '0.5rem 0' }}>{mutationError}</p>
-      )}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
-        <SortableContext items={categories.map(c => `cat-${c.id}`)} strategy={rectSortingStrategy}>
-          <div className="menu-grid">
-            {categories.map(cat => (
-              <SortableCategory
-                key={cat.id}
-                category={cat}
-                isAdmin={isAdmin}
-                editingItemId={editingItemId}
-                newItemCategoryId={newItemCategoryId}
-                onEditItem={item => { setNewItemCategoryId(null); setEditingItemId(item.id) }}
-                onSaveItem={handleSaveItem}
-                onCancelEdit={handleCancelEdit}
-                onSoftDelete={handleSoftDelete}
-                onHardDelete={handleHardDelete}
-                onRestore={handleRestore}
-                onAddItem={handleAddItem}
-                onCategoryNameChange={handleCategoryNameChange}
-                onCategoryNameBlur={handleCategoryNameBlur}
-                onDeleteCategory={handleDeleteCategory}
-                onItemsReorder={handleItemsReorder}
-              />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
+  const adminContext = {
+    isAdmin,
+    editingItemId,
+    newItemCategoryId,
+    onEditItem:            handleEditItem,
+    onSaveItem:            handleSaveItem,
+    onCancelEdit:          handleCancelEdit,
+    onSoftDelete:          handleSoftDelete,
+    onHardDelete:          handleHardDelete,
+    onRestore:             handleRestore,
+    onAddItem:             handleAddItem,
+    onCategoryNameChange:  handleCategoryNameChange,
+    onCategoryNameBlur:    handleCategoryNameBlur,
+    onDeleteCategory:      handleDeleteCategory,
+    onItemsReorder:        handleItemsReorder,
+  }
 
-      {isAdmin && (
-        <div className="admin-footer">
-          <button className="btn-add-category" onClick={handleAddCategory}>
-            + Legg til kategori
-          </button>
-        </div>
-      )}
-    </div>
+  return (
+    <MenuAdminContext.Provider value={adminContext}>
+      <div className="menu-page">
+        {mutationError && <p className="form-error" style={{ textAlign: 'center', padding: '0.5rem 0' }}>{mutationError}</p>}
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
+          <SortableContext items={categories.map(c => `cat-${c.id}`)} strategy={rectSortingStrategy}>
+            <div className="menu-grid">
+              {categories.map(cat => (
+                <SortableCategory key={cat.id} category={cat} />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+
+        {isAdmin && (
+          <div className="admin-footer">
+            <button className="btn-add-category" onClick={handleAddCategory}>
+              + Legg til kategori
+            </button>
+          </div>
+        )}
+      </div>
+    </MenuAdminContext.Provider>
   )
 }
