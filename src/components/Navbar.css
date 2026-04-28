@@ -73,15 +73,17 @@
   color: var(--fg);
   text-decoration: none;
   font-family: 'InterDisplay', sans-serif;
-  font-weight: 800;
+  font-weight: 200;
+  font-style: normal;
   font-size: clamp(1.4rem, 3.5vw, 2.2rem);
-  letter-spacing: -0.035em;
+  letter-spacing: -0.02em;
   line-height: 1.05;
 
   opacity: 0;
   transform: translateX(1.5rem);
   transition:
     color 0.2s ease,
+    font-style 0.15s ease,
     opacity 0.35s ease calc(var(--item-index) * 55ms),
     transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--item-index) * 55ms);
 }
@@ -93,6 +95,7 @@
 
 .nav-links li a:hover {
   color: var(--fg-dim);
+  font-style: italic;
 }
 
 /* ── Admin row ────────────────────────────────────────────────── */
