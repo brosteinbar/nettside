@@ -44,5 +44,5 @@
 ## Overcomplicated Processes
 
 - [x] **Menu.jsx — prop drilling** — Introduced `MenuAdminContext`; `SortableCategory` and `SortableMenuItem` now read all handlers from context instead of props. `SortableCategory` reduced from 13 props to 1 (`category`)
-- [x] **Menu.jsx — race condition** — `onCategoryNameBlur` now receives `e.target.value` directly from the DOM event instead of reading `category.name` from React state, eliminating the inconsistency window
+- [x] **Menu.jsx — race condition** — False positive; React controlled inputs keep state and DOM in sync, so no actual race condition exists
 - [x] **CSS `!important`** — `.event-form-title` rule replaced with `.event-form input.event-form-title` (specificity 0,2,1 beats 0,1,1); all three `!important` flags removed
