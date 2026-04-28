@@ -2,9 +2,9 @@
 
 ## Dead Code
 
-- [ ] **LoginModal.css** — Remove textarea input styling (no textarea exists in LoginModal markup)
-- [ ] **Arrangement.jsx** — Remove unused `Fragment` import
-- [ ] **Navbar.jsx** — Remove duplicate `close` declaration (defined twice: inside useEffect closure and in component body)
+- [x] **LoginModal.css** — No textarea styles found; audit was a false positive
+- [x] **Arrangement.jsx** — `Fragment` is used; audit was a false positive
+- [x] **Navbar.jsx** — Hoisted `close` to component scope; removed duplicate declaration from inside useEffect
 
 ---
 

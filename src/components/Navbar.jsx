@@ -16,6 +16,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const headerRef = useRef(null)
   const { user } = useAuth()
+  const close = () => setIsOpen(false)
 
   useEffect(() => {
     const header    = headerRef.current
@@ -23,8 +24,7 @@ export default function Navbar() {
     if (!header || !hamburger) return
     if (window.matchMedia('(pointer: coarse)').matches) return
 
-    const open  = () => setIsOpen(true)
-    const close = () => setIsOpen(false)
+    const open = () => setIsOpen(true)
     hamburger.addEventListener('mouseenter', open)
     header.addEventListener('mouseleave', close)
     return () => {
@@ -34,7 +34,6 @@ export default function Navbar() {
   }, [])
 
   const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
-  const close = () => setIsOpen(false)
 
   return (
     <header className="site-header" ref={headerRef}>
