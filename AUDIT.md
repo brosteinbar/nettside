@@ -55,8 +55,8 @@
 
 - [x] **Context value identity (AuthContext)** — Wrapped value in `useMemo(() => ({ user }), [user])`
 - [ ] **Context value identity (MenuAdminContext)** — Deferred. The handlers in `Menu.jsx` are recreated every render and most close over `categories` state, so a `useMemo` would only be effective if combined with `useCallback` on every handler. Without `React.memo` on `SortableCategory`/`SortableMenuItem` it provides no actual perf benefit, since children re-render with the parent regardless. Skipping until there's evidence of perf issues
-- [ ] **`useLoginForm.js` — loading not reset on success** — `setLoading(false)` only called in error branch. Invisible in current usage (component unmounts), but technically wrong. Add it before `onSuccess()`
-- [ ] **`Menu.jsx fetchData` — silent partial failure** — If categories succeed but items fetch fails, items silently becomes `[]`. Check both responses and surface an error
+- [x] **`useLoginForm.js` — loading not reset on success** — `setLoading(false)` now called unconditionally before branching
+- [x] **`Menu.jsx fetchData` — silent partial failure** — Now checks both `catsResult.error` and `itemsResult.error` and surfaces "Kunne ikke laste meny." on either failure
 
 ## Accessibility
 
@@ -64,21 +64,21 @@
 - [x] **Form inputs missing `<label>`** — Added `aria-label` to all unlabeled inputs (item form, event form, date/time/select, category name)
 - [x] **Drag handles unreachable by keyboard** — Removed `tabIndex={-1}` from item and category drag handles; dnd-kit's `KeyboardSensor` was already configured, so Space/Arrow keys now work
 - [x] **Focus styles inadequate** — Added global `*:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }` in `index.css`
-- [ ] **Navbar keyboard navigation** — No Escape-to-close, no keyboard way to open the menu (only mouseenter / tap). Add Escape key handler and ensure hamburger button toggles on Enter/Space
-- [ ] **Tap targets below 44×44px** — Menu action buttons (✎ × ↩ ✕) and drag handles too small for reliable mobile use
+- [x] **Navbar keyboard navigation** — Hamburger now always toggles on click (so Enter/Space works), and an Escape key handler closes the menu when open
+- [ ] **Tap targets below 44×44px** — Skipped per user (single admin user, not a public-facing concern)
 
 ## Architecture / Robustness
 
 - [x] **No 404 route** — Added `<Route path="*" element={<NotFound />} />` in `App.jsx`
 - [x] **No ErrorBoundary** — Added `src/components/ErrorBoundary.jsx`; wraps `<Routes>` in `App.jsx`
-- [ ] **AuthContext has no `loading` state** — `/admin` briefly shows the login form before `getSession()` resolves. Add a `loading` state and gate UI on it
-- [ ] **No lazy loading of routes** — All 5 pages eagerly imported into the 475 KB bundle. Use `React.lazy` + `<Suspense>` for at least Admin/Menu/Arrangement
+- [x] **AuthContext has no `loading` state** — Added `loading` state to `AuthContext`; `Admin.jsx` returns `null` while loading to prevent the login-form flash
+- [x] **No lazy loading of routes** — Menu, Kontakt, Admin, Arrangement now lazy-loaded via `React.lazy` + `<Suspense>`. Main bundle dropped from 476 KB → 414 KB; Menu's 55 KB only loads on `/meny`
 - [x] **Unused `puppeteer` dependency** — Removed via `npm uninstall puppeteer`; 89 transitive packages removed
 
 ## Code Quality (minor)
 
 - [x] **Hardcoded `#b94040`** — Promoted to `--error` CSS variable in `:root`; both usages now reference `var(--error)`
-- [ ] **Inconsistent transition durations** — 0.15s, 0.2s, 0.35s, 0.55s scattered. Pick a small set (e.g. 0.15s / 0.3s) and stick to it
-- [ ] **`signOut()` fire-and-forget** — `Navbar.jsx` doesn't await `supabase.auth.signOut()` and ignores errors
-- [ ] **Item-reorder race** — Rapid drags while previous saves are in flight can produce wrong final `sort_order`. Lock during save, or queue
-- [ ] **`isTouch` recomputed every render** — `Navbar.jsx:36` re-runs `matchMedia(...)` on every render. Compute once in state (very minor)
+- [ ] **Inconsistent transition durations** — Skipped; the 0.35s/0.55s values are intentional design (navbar animation choreography), not bugs
+- [x] **`signOut()` fire-and-forget** — Now logs errors to console via `.catch()` (cannot recover from sign-out failure, but at least surfaces it)
+- [x] **Item-reorder race** — Saves are now serialized through a `reorderQueue` ref so each Supabase write completes before the next starts; final state always matches the latest local order
+- [x] **`isTouch` recomputed every render** — Now stored in state, initialized from `matchMedia`, and updated via a `change` listener on the media query

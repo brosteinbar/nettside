@@ -5,8 +5,10 @@ import { LoginForm } from '../components/LoginForm'
 import './Admin.css'
 
 export default function Admin() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const navigate = useNavigate()
+
+  if (loading) return null
 
   if (user) {
     return (

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, createContext, useContext } from 'react'
+import { useEffect, useState, useCallback, useRef, createContext, useContext } from 'react'
 import {
   DndContext,
   closestCenter,
@@ -225,19 +225,27 @@ export default function Menu() {
 
   const sensors = useDndSensors()
 
+  const reorderQueue = useRef(Promise.resolve())
+
   const fetchData = useCallback(async () => {
-    const [{ data: cats }, { data: items }] = await Promise.all([
+    const [catsResult, itemsResult] = await Promise.all([
       supabase.from('menu_categories').select('*').order('sort_order'),
       supabase.from('menu_items').select('*').order('sort_order'),
     ])
-    if (!cats) return
-    setCategories(cats.map(c => ({ ...c, items: (items ?? []).filter(i => i.category_id === c.id) })))
+    if (catsResult.error || itemsResult.error) {
+      setMutationError('Kunne ikke laste meny.')
+      setLoading(false)
+      return
+    }
+    const cats = catsResult.data ?? []
+    const items = itemsResult.data ?? []
+    setCategories(cats.map(c => ({ ...c, items: items.filter(i => i.category_id === c.id) })))
     setLoading(false)
   }, [])
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  async function handleCategoryDragEnd({ active, over }) {
+  function handleCategoryDragEnd({ active, over }) {
     if (!over || active.id === over.id) return
     const aId = String(active.id)
     const oId = String(over.id)
@@ -246,13 +254,15 @@ export default function Menu() {
     const to   = categories.findIndex(c => `cat-${c.id}` === oId)
     const reordered = arrayMove(categories, from, to)
     setCategories(reordered)
-    const results = await Promise.all(reordered.map((c, i) =>
-      supabase.from('menu_categories').update({ sort_order: i }).eq('id', c.id)
-    ))
-    if (results.some(r => r.error)) setMutationError('Kunne ikke lagre rekkefølge.')
+    reorderQueue.current = reorderQueue.current.then(async () => {
+      const results = await Promise.all(reordered.map((c, i) =>
+        supabase.from('menu_categories').update({ sort_order: i }).eq('id', c.id)
+      ))
+      if (results.some(r => r.error)) setMutationError('Kunne ikke lagre rekkefølge.')
+    })
   }
 
-  async function handleItemsReorder(catId, activeId, overId) {
+  function handleItemsReorder(catId, activeId, overId) {
     const cat = categories.find(c => c.id === catId)
     if (!cat) return
     const activeItems  = cat.items.filter(i => !i.deleted_at)
@@ -262,10 +272,12 @@ export default function Menu() {
     if (from === -1 || to === -1) return
     const reordered = arrayMove(activeItems, from, to)
     setCategories(prev => prev.map(c => c.id === catId ? { ...c, items: [...reordered, ...deletedItems] } : c))
-    const results = await Promise.all(reordered.map((item, i) =>
-      supabase.from('menu_items').update({ sort_order: i }).eq('id', item.id)
-    ))
-    if (results.some(r => r.error)) setMutationError('Kunne ikke lagre rekkefølge.')
+    reorderQueue.current = reorderQueue.current.then(async () => {
+      const results = await Promise.all(reordered.map((item, i) =>
+        supabase.from('menu_items').update({ sort_order: i }).eq('id', item.id)
+      ))
+      if (results.some(r => r.error)) setMutationError('Kunne ikke lagre rekkefølge.')
+    })
   }
 
   async function handleSaveItem(itemId, catId, vals) {

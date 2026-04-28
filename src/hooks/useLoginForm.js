@@ -12,9 +12,9 @@ export function useLoginForm(onSuccess) {
     setLoading(true)
     setError(null)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
+    setLoading(false)
     if (error) {
       setError('Feil e-post eller passord.')
-      setLoading(false)
     } else {
       onSuccess()
     }

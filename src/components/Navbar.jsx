@@ -12,17 +12,27 @@ const MENU_ITEMS = [
   { label: 'Kontakt',     href: '/kontakt' },
 ]
 
+const matchesTouch = () =>
+  typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isTouch, setIsTouch] = useState(matchesTouch)
   const headerRef = useRef(null)
   const { user } = useAuth()
   const close = () => setIsOpen(false)
 
   useEffect(() => {
+    const mql = window.matchMedia('(pointer: coarse)')
+    const onChange = e => setIsTouch(e.matches)
+    mql.addEventListener('change', onChange)
+    return () => mql.removeEventListener('change', onChange)
+  }, [])
+
+  useEffect(() => {
     const header    = headerRef.current
     const hamburger = header?.querySelector('.hamburger')
-    if (!header || !hamburger) return
-    if (window.matchMedia('(pointer: coarse)').matches) return
+    if (!header || !hamburger || isTouch) return
 
     const open = () => setIsOpen(true)
     hamburger.addEventListener('mouseenter', open)
@@ -31,16 +41,26 @@ export default function Navbar() {
       hamburger.removeEventListener('mouseenter', open)
       header.removeEventListener('mouseleave', close)
     }
-  }, [])
+  }, [isTouch])
 
-  const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+  useEffect(() => {
+    if (!isOpen) return
+    const onKey = e => { if (e.key === 'Escape') close() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen])
+
+  function handleSignOut() {
+    supabase.auth.signOut().catch(err => console.error('Sign out failed:', err))
+    close()
+  }
 
   return (
     <header className="site-header" ref={headerRef}>
       <nav className="navbar">
         <button
           className={`hamburger${isOpen ? ' is-open' : ''}`}
-          onClick={isTouch ? () => setIsOpen(!isOpen) : undefined}
+          onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? 'Lukk meny' : 'Åpne meny'}
           aria-expanded={isOpen}
           aria-controls="nav-dropdown"
@@ -63,10 +83,7 @@ export default function Navbar() {
           </ul>
           {user && (
             <div className="nav-admin-row">
-              <button
-                className="nav-admin-btn"
-                onClick={() => { supabase.auth.signOut(); close() }}
-              >
+              <button className="nav-admin-btn" onClick={handleSignOut}>
                 Logg ut
               </button>
             </div>
