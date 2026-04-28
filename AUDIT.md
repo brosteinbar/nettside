@@ -46,3 +46,39 @@
 - [x] **Menu.jsx — prop drilling** — Introduced `MenuAdminContext`; `SortableCategory` and `SortableMenuItem` now read all handlers from context instead of props. `SortableCategory` reduced from 13 props to 1 (`category`)
 - [x] **Menu.jsx — race condition** — False positive; React controlled inputs keep state and DOM in sync, so no actual race condition exists
 - [x] **CSS `!important`** — `.event-form-title` rule replaced with `.event-form input.event-form-title` (specificity 0,2,1 beats 0,1,1); all three `!important` flags removed
+
+---
+
+# Second-Pass Audit
+
+## Bugs
+
+- [x] **Context value identity (AuthContext)** — Wrapped value in `useMemo(() => ({ user }), [user])`
+- [ ] **Context value identity (MenuAdminContext)** — Deferred. The handlers in `Menu.jsx` are recreated every render and most close over `categories` state, so a `useMemo` would only be effective if combined with `useCallback` on every handler. Without `React.memo` on `SortableCategory`/`SortableMenuItem` it provides no actual perf benefit, since children re-render with the parent regardless. Skipping until there's evidence of perf issues
+- [ ] **`useLoginForm.js` — loading not reset on success** — `setLoading(false)` only called in error branch. Invisible in current usage (component unmounts), but technically wrong. Add it before `onSuccess()`
+- [ ] **`Menu.jsx fetchData` — silent partial failure** — If categories succeed but items fetch fails, items silently becomes `[]`. Check both responses and surface an error
+
+## Accessibility
+
+- [ ] **Icon-only buttons missing `aria-label`** — ✎ × ↩ ✕ ⠿ across `Menu.jsx`, `Arrangement.jsx`, and modal close in `LoginModal.jsx`. `title` is tooltip-only and not announced by screen readers
+- [ ] **Form inputs missing `<label>`** — `EditItemForm` (Menu) and `EventForm` (Arrangement) use placeholders only. Add `<label>` (visible or visually-hidden)
+- [ ] **Drag handles unreachable by keyboard** — `tabIndex={-1}` on drag handles prevents keyboard reordering. dnd-kit supports `KeyboardSensor` (already configured), but the handle itself must be focusable
+- [ ] **Focus styles inadequate** — Only `border-bottom-color` changes on input focus. Add a visible focus indicator (e.g. `outline` or stronger border)
+- [ ] **Navbar keyboard navigation** — No Escape-to-close, no keyboard way to open the menu (only mouseenter / tap). Add Escape key handler and ensure hamburger button toggles on Enter/Space
+- [ ] **Tap targets below 44×44px** — Menu action buttons (✎ × ↩ ✕) and drag handles too small for reliable mobile use
+
+## Architecture / Robustness
+
+- [x] **No 404 route** — Added `<Route path="*" element={<NotFound />} />` in `App.jsx`
+- [x] **No ErrorBoundary** — Added `src/components/ErrorBoundary.jsx`; wraps `<Routes>` in `App.jsx`
+- [ ] **AuthContext has no `loading` state** — `/admin` briefly shows the login form before `getSession()` resolves. Add a `loading` state and gate UI on it
+- [ ] **No lazy loading of routes** — All 5 pages eagerly imported into the 475 KB bundle. Use `React.lazy` + `<Suspense>` for at least Admin/Menu/Arrangement
+- [x] **Unused `puppeteer` dependency** — Removed via `npm uninstall puppeteer`; 89 transitive packages removed
+
+## Code Quality (minor)
+
+- [ ] **Hardcoded `#b94040`** — Defined inline in `.form-error` (index.css) and `.btn-hard-delete` (Menu.css). Promote to `--error` CSS variable in `:root`
+- [ ] **Inconsistent transition durations** — 0.15s, 0.2s, 0.35s, 0.55s scattered. Pick a small set (e.g. 0.15s / 0.3s) and stick to it
+- [ ] **`signOut()` fire-and-forget** — `Navbar.jsx` doesn't await `supabase.auth.signOut()` and ignores errors
+- [ ] **Item-reorder race** — Rapid drags while previous saves are in flight can produce wrong final `sort_order`. Lock during save, or queue
+- [ ] **`isTouch` recomputed every render** — `Navbar.jsx:36` re-runs `matchMedia(...)` on every render. Compute once in state (very minor)
