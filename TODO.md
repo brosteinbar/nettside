@@ -28,6 +28,10 @@
 - [x] Add hover effects: italic on hover
 
 ### 5. Move admin login to `/admin` route
-- [ ] Remove "Admin"/"Logg ut" button from hamburger menu
-- [ ] Create `/#/admin` route with a standalone login page
-- [ ] Redirect to menu (or a dashboard) after successful login
+- [x] Remove "Admin"/"Logg ut" button from hamburger menu
+- [x] Create `/#/admin` route with a standalone login page
+- [x] Redirect to menu (or a dashboard) after successful login
+
+### 6. Navbar overlay pushes page content down
+- [ ] When the hamburger menu opens, the dropdown expands and pushes page content down instead of overlaying it
+- [ ] Especially problematic on the menu page — fix so the dropdown floats over content

@@ -1,6 +1,6 @@
 .site-header {
+  position: relative;
   height: var(--nav-height);
-  overflow: visible;
   z-index: 10;
 }
 
@@ -44,6 +44,9 @@
 /* ── Dropdown ─────────────────────────────────────────────────── */
 
 .nav-dropdown {
+  position: absolute;
+  top: var(--nav-height);
+  right: 0;
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.55s cubic-bezier(0.16, 1, 0.3, 1);
