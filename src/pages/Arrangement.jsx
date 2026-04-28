@@ -31,18 +31,45 @@ function formatDate(dateStr) {
   return `${day}. ${MONTHS_NO[month - 1]} ${year}`
 }
 
-function sortEvents(events) {
-  const recurring = events
-    .filter(e => e.cron)
-    .sort((a, b) => {
-      const da = cronDayIndex(a.cron) || 7
-      const db = cronDayIndex(b.cron) || 7
-      return da - db
-    })
-  const oneTime = events
-    .filter(e => !e.cron)
-    .sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
-  return [...recurring, ...oneTime]
+function formatVirtualDate(dateStr) {
+  const [year, month, day] = dateStr.split('-').map(Number)
+  const d = new Date(year, month - 1, day)
+  return `${DAYS_NO[d.getDay()]} ${day}. ${MONTHS_NO[month - 1]}`
+}
+
+function getNextOccurrences(dayOfWeek, count = 4) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const current = new Date(today)
+  const daysUntil = (dayOfWeek - current.getDay() + 7) % 7
+  current.setDate(current.getDate() + daysUntil)
+  const result = []
+  for (let i = 0; i < count; i++) {
+    const y = current.getFullYear()
+    const m = String(current.getMonth() + 1).padStart(2, '0')
+    const d = String(current.getDate()).padStart(2, '0')
+    result.push(`${y}-${m}-${d}`)
+    current.setDate(current.getDate() + 7)
+  }
+  return result
+}
+
+function expandAndSortEvents(events) {
+  const expanded = []
+  for (const event of events) {
+    if (event.cron) {
+      for (const dateStr of getNextOccurrences(cronDayIndex(event.cron), 4)) {
+        expanded.push({ ...event, _virtualDate: dateStr })
+      }
+    } else {
+      expanded.push(event)
+    }
+  }
+  return expanded.sort((a, b) => {
+    const da = a._virtualDate ?? a.date ?? ''
+    const db = b._virtualDate ?? b.date ?? ''
+    return da.localeCompare(db)
+  })
 }
 
 function EventForm({ event, onSave, onCancel }) {
@@ -121,8 +148,8 @@ function EventForm({ event, onSave, onCancel }) {
 function EventCard({ event, isAdmin, onEdit, onDelete, isPast }) {
   const timeRange = formatTime(event.start_time) +
     (event.end_time ? `–${formatTime(event.end_time)}` : '')
-  const when = event.cron
-    ? `Hver ${DAYS_NO[cronDayIndex(event.cron)].toLowerCase()}`
+  const when = event._virtualDate
+    ? formatVirtualDate(event._virtualDate)
     : formatDate(event.date)
 
   return (
@@ -150,7 +177,7 @@ export default function Arrangement() {
 
   const fetchEvents = useCallback(async () => {
     const { data } = await supabase.from('events').select('*')
-    setEvents(sortEvents(data ?? []))
+    setEvents(data ?? [])
     setLoading(false)
   }, [])
 
@@ -158,13 +185,13 @@ export default function Arrangement() {
 
   async function handleCreate(vals) {
     const { data } = await supabase.from('events').insert(vals).select().single()
-    if (data) setEvents(prev => sortEvents([...prev, data]))
+    if (data) setEvents(prev => [...prev, data])
     setShowNewForm(false)
   }
 
   async function handleUpdate(id, vals) {
     await supabase.from('events').update(vals).eq('id', id)
-    setEvents(prev => sortEvents(prev.map(e => e.id === id ? { ...e, ...vals } : e)))
+    setEvents(prev => prev.map(e => e.id === id ? { ...e, ...vals } : e))
     setEditingId(null)
   }
 
@@ -175,33 +202,42 @@ export default function Arrangement() {
 
   if (loading) return <div className="arrangement-loading">Laster arrangementer…</div>
 
-  const today = new Date().toISOString().split('T')[0]
+  const _now = new Date()
+  const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`
+  const expandedEvents = expandAndSortEvents(events)
+  let editFormShown = false
 
   return (
     <div className="arrangement-page">
-      {events.length === 0 && !showNewForm && (
+      {expandedEvents.length === 0 && !showNewForm && (
         <p className="arrangement-empty">Ingen kommende arrangementer.</p>
       )}
       <div className="arrangement-list">
-        {events.map(event =>
-          editingId === event.id ? (
-            <EventForm
-              key={event.id}
-              event={event}
-              onSave={vals => handleUpdate(event.id, vals)}
-              onCancel={() => setEditingId(null)}
-            />
-          ) : (
+        {expandedEvents.map(event => {
+          const key = event._virtualDate ? `${event.id}-${event._virtualDate}` : String(event.id)
+          if (editingId === event.id) {
+            if (editFormShown) return null
+            editFormShown = true
+            return (
+              <EventForm
+                key={key}
+                event={event}
+                onSave={vals => handleUpdate(event.id, vals)}
+                onCancel={() => setEditingId(null)}
+              />
+            )
+          }
+          return (
             <EventCard
-              key={event.id}
+              key={key}
               event={event}
               isAdmin={isAdmin}
               onEdit={e => { setShowNewForm(false); setEditingId(e.id) }}
               onDelete={handleDelete}
-              isPast={!event.cron && event.date < today}
+              isPast={!event._virtualDate && event.date < today}
             />
           )
-        )}
+        })}
         {showNewForm && (
           <EventForm
             event={null}
