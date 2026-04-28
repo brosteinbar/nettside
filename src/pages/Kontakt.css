@@ -1,0 +1,56 @@
+.kontakt-page {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 2rem;
+}
+
+.kontakt-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.kontakt-email,
+.kontakt-address {
+  font-family: 'InterDisplay', sans-serif;
+  font-weight: 300;
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.kontakt-email:hover {
+  color: var(--fg-dim);
+  font-style: italic;
+}
+
+.kontakt-footer {
+  display: flex;
+  gap: 2.5rem;
+  justify-content: center;
+  padding-bottom: 2rem;
+}
+
+.kontakt-footer a {
+  font-family: 'InterDisplay', sans-serif;
+  font-weight: 200;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  letter-spacing: 0.03em;
+  color: var(--fg);
+  text-decoration: none;
+  font-style: normal;
+  transition: color 0.15s;
+}
+
+.kontakt-footer a:hover {
+  color: var(--fg-dim);
+  font-style: italic;
+}
