@@ -196,9 +196,11 @@ export default function Arrangement() {
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState(null)
   const [showNewForm, setShowNewForm] = useState(false)
+  const [mutationError, setMutationError] = useState(null)
 
   const fetchEvents = useCallback(async () => {
-    const { data } = await supabase.from('events').select('*')
+    const { data, error } = await supabase.from('events').select('*')
+    if (error) { setMutationError('Kunne ikke laste arrangementer.'); setLoading(false); return }
     setEvents(data ?? [])
     setLoading(false)
   }, [])
@@ -206,19 +208,22 @@ export default function Arrangement() {
   useEffect(() => { fetchEvents() }, [fetchEvents])
 
   async function handleCreate(vals) {
-    const { data } = await supabase.from('events').insert(vals).select().single()
-    if (data) setEvents(prev => [...prev, data])
+    const { data, error } = await supabase.from('events').insert(vals).select().single()
+    if (error) { setMutationError('Kunne ikke opprette arrangement.'); return }
+    setEvents(prev => [...prev, data])
     setShowNewForm(false)
   }
 
   async function handleUpdate(id, vals) {
-    await supabase.from('events').update(vals).eq('id', id)
+    const { error } = await supabase.from('events').update(vals).eq('id', id)
+    if (error) { setMutationError('Kunne ikke oppdatere arrangement.'); return }
     setEvents(prev => prev.map(e => e.id === id ? { ...e, ...vals } : e))
     setEditingId(null)
   }
 
   async function handleDelete(id) {
-    await supabase.from('events').delete().eq('id', id)
+    const { error } = await supabase.from('events').delete().eq('id', id)
+    if (error) { setMutationError('Kunne ikke slette arrangement.'); return }
     setEvents(prev => prev.filter(e => e.id !== id))
   }
 
@@ -231,6 +236,9 @@ export default function Arrangement() {
 
   return (
     <div className="arrangement-page">
+      {mutationError && (
+        <p style={{ color: '#b94040', textAlign: 'center', padding: '0.5rem 0' }}>{mutationError}</p>
+      )}
       {expandedEvents.length === 0 && !showNewForm && (
         <p className="arrangement-empty">Ingen kommende arrangementer.</p>
       )}

@@ -34,23 +34,33 @@ function EditItemForm({ item, onSave, onCancel }) {
     allergens: item?.allergens ?? '',
     price: item?.price ?? '',
   })
+  const [errors, setErrors] = useState({})
   const set = (f) => (e) => setVals(v => ({ ...v, [f]: e.target.value }))
+
+  function handleSave() {
+    const errs = {}
+    if (!vals.name.trim()) errs.name = 'Navn er påkrevd'
+    else if (vals.name.length > 100) errs.name = 'Maks 100 tegn'
+    if (vals.description.length > 500) errs.description = 'Maks 500 tegn'
+    if (vals.allergens.length > 500) errs.allergens = 'Maks 500 tegn'
+    if (vals.price !== '' && (isNaN(Number(vals.price)) || Number(vals.price) < 0))
+      errs.price = 'Ugyldig pris'
+    if (Object.keys(errs).length) { setErrors(errs); return }
+    onSave({ ...vals, price: vals.price === '' ? null : Number(vals.price) })
+  }
 
   return (
     <li className="edit-item-form">
       <input placeholder="Navn *" value={vals.name} onChange={set('name')} autoFocus />
+      {errors.name && <span style={{ color: '#b94040', fontSize: '0.8rem' }}>{errors.name}</span>}
       <input placeholder="Beskrivelse" value={vals.description} onChange={set('description')} />
+      {errors.description && <span style={{ color: '#b94040', fontSize: '0.8rem' }}>{errors.description}</span>}
       <input placeholder="Allergener (f, m, g…)" value={vals.allergens} onChange={set('allergens')} />
+      {errors.allergens && <span style={{ color: '#b94040', fontSize: '0.8rem' }}>{errors.allergens}</span>}
       <input placeholder="Pris" type="number" value={vals.price} onChange={set('price')} />
+      {errors.price && <span style={{ color: '#b94040', fontSize: '0.8rem' }}>{errors.price}</span>}
       <div className="edit-form-actions">
-        <button
-          onClick={() => {
-            if (!vals.name.trim()) return
-            onSave({ ...vals, price: vals.price === '' ? null : Number(vals.price) })
-          }}
-        >
-          Lagre
-        </button>
+        <button onClick={handleSave}>Lagre</button>
         <button onClick={onCancel}>Avbryt</button>
       </div>
     </li>
@@ -225,6 +235,7 @@ export default function Menu() {
   const [loading, setLoading] = useState(true)
   const [editingItemId, setEditingItemId] = useState(null)
   const [newItemCategoryId, setNewItemCategoryId] = useState(null)
+  const [mutationError, setMutationError] = useState(null)
 
   const sensors = useDndSensors()
 
@@ -240,7 +251,7 @@ export default function Menu() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  function handleCategoryDragEnd({ active, over }) {
+  async function handleCategoryDragEnd({ active, over }) {
     if (!over || active.id === over.id) return
     const aId = String(active.id)
     const oId = String(over.id)
@@ -249,12 +260,13 @@ export default function Menu() {
     const to   = categories.findIndex(c => `cat-${c.id}` === oId)
     const reordered = arrayMove(categories, from, to)
     setCategories(reordered)
-    Promise.all(reordered.map((c, i) =>
+    const results = await Promise.all(reordered.map((c, i) =>
       supabase.from('menu_categories').update({ sort_order: i }).eq('id', c.id)
     ))
+    if (results.some(r => r.error)) setMutationError('Kunne ikke lagre rekkefølge.')
   }
 
-  function handleItemsReorder(catId, activeId, overId) {
+  async function handleItemsReorder(catId, activeId, overId) {
     const cat = categories.find(c => c.id === catId)
     if (!cat) return
     const activeItems  = cat.items.filter(i => !i.deleted_at)
@@ -264,15 +276,16 @@ export default function Menu() {
     if (from === -1 || to === -1) return
     const reordered = arrayMove(activeItems, from, to)
     setCategories(prev => prev.map(c => c.id === catId ? { ...c, items: [...reordered, ...deletedItems] } : c))
-    Promise.all(reordered.map((item, i) =>
+    const results = await Promise.all(reordered.map((item, i) =>
       supabase.from('menu_items').update({ sort_order: i }).eq('id', item.id)
     ))
+    if (results.some(r => r.error)) setMutationError('Kunne ikke lagre rekkefølge.')
   }
 
   async function handleSaveItem(itemId, catId, vals) {
     if (itemId === 'new') {
       const sortOrder = (categories.find(c => c.id === catId)?.items.filter(i => !i.deleted_at).length) ?? 0
-      const { data } = await supabase.from('menu_items').insert({
+      const { data, error } = await supabase.from('menu_items').insert({
         category_id: catId,
         name: vals.name,
         description: vals.description || null,
@@ -280,14 +293,16 @@ export default function Menu() {
         price: vals.price,
         sort_order: sortOrder,
       }).select().single()
-      if (data) setCategories(prev => prev.map(c => c.id === catId ? { ...c, items: [...c.items, data] } : c))
+      if (error) { setMutationError('Kunne ikke lagre rett.'); return }
+      setCategories(prev => prev.map(c => c.id === catId ? { ...c, items: [...c.items, data] } : c))
     } else {
-      await supabase.from('menu_items').update({
+      const { error } = await supabase.from('menu_items').update({
         name: vals.name,
         description: vals.description || null,
         allergens: vals.allergens || null,
         price: vals.price,
       }).eq('id', itemId)
+      if (error) { setMutationError('Kunne ikke oppdatere rett.'); return }
       setCategories(prev => prev.map(c => ({
         ...c,
         items: c.items.map(i => i.id === itemId ? { ...i, ...vals } : i),
@@ -299,7 +314,8 @@ export default function Menu() {
 
   async function handleSoftDelete(itemId) {
     const now = new Date().toISOString()
-    await supabase.from('menu_items').update({ deleted_at: now }).eq('id', itemId)
+    const { error } = await supabase.from('menu_items').update({ deleted_at: now }).eq('id', itemId)
+    if (error) { setMutationError('Kunne ikke slette rett.'); return }
     setCategories(prev => prev.map(c => ({
       ...c,
       items: c.items.map(i => i.id === itemId ? { ...i, deleted_at: now } : i),
@@ -307,7 +323,8 @@ export default function Menu() {
   }
 
   async function handleRestore(itemId) {
-    await supabase.from('menu_items').update({ deleted_at: null }).eq('id', itemId)
+    const { error } = await supabase.from('menu_items').update({ deleted_at: null }).eq('id', itemId)
+    if (error) { setMutationError('Kunne ikke gjenopprette rett.'); return }
     setCategories(prev => prev.map(c => ({
       ...c,
       items: c.items.map(i => i.id === itemId ? { ...i, deleted_at: null } : i),
@@ -315,20 +332,23 @@ export default function Menu() {
   }
 
   async function handleHardDelete(itemId) {
-    await supabase.from('menu_items').delete().eq('id', itemId)
+    const { error } = await supabase.from('menu_items').delete().eq('id', itemId)
+    if (error) { setMutationError('Kunne ikke slette rett permanent.'); return }
     setCategories(prev => prev.map(c => ({ ...c, items: c.items.filter(i => i.id !== itemId) })))
   }
 
   async function handleAddCategory() {
-    const { data } = await supabase.from('menu_categories').insert({
+    const { data, error } = await supabase.from('menu_categories').insert({
       name: 'Ny kategori',
       sort_order: categories.length,
     }).select().single()
-    if (data) setCategories(prev => [...prev, { ...data, items: [] }])
+    if (error) { setMutationError('Kunne ikke opprette kategori.'); return }
+    setCategories(prev => [...prev, { ...data, items: [] }])
   }
 
   async function handleDeleteCategory(catId) {
-    await supabase.from('menu_categories').delete().eq('id', catId)
+    const { error } = await supabase.from('menu_categories').delete().eq('id', catId)
+    if (error) { setMutationError('Kunne ikke slette kategori.'); return }
     setCategories(prev => prev.filter(c => c.id !== catId))
   }
 
@@ -337,7 +357,8 @@ export default function Menu() {
   }
 
   async function handleCategoryNameBlur(catId, name) {
-    await supabase.from('menu_categories').update({ name }).eq('id', catId)
+    const { error } = await supabase.from('menu_categories').update({ name }).eq('id', catId)
+    if (error) setMutationError('Kunne ikke lagre kategorinavn.')
   }
 
   function handleAddItem(catId) {
@@ -354,6 +375,9 @@ export default function Menu() {
 
   return (
     <div className="menu-page">
+      {mutationError && (
+        <p style={{ color: '#b94040', textAlign: 'center', padding: '0.5rem 0' }}>{mutationError}</p>
+      )}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
         <SortableContext items={categories.map(c => `cat-${c.id}`)} strategy={rectSortingStrategy}>
           <div className="menu-grid">
