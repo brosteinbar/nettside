@@ -11,9 +11,9 @@ export default function Kontakt() {
       </main>
 
       <footer className="kontakt-footer">
-        <a href="https://www.instagram.com/brosteinbar" target="_blank" rel="noopener noreferrer">Instagram</a>
-        <a href="https://www.facebook.com/brosteinbar" target="_blank" rel="noopener noreferrer">Facebook</a>
-        <a href="https://www.youtube.com/@brosteinbar" target="_blank" rel="noopener noreferrer">YouTube</a>
+        <a href="https://www.instagram.com/brostein.oslo" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <span>Facebook</span>
+        <span>YouTube</span>
       </footer>
     </div>
   )
