@@ -207,6 +207,7 @@ export default function Arrangement() {
     setLoading(false)
   }, [])
 
+  useEffect(() => { document.title = 'Arrangement — Brostein' }, [])
   useEffect(() => { fetchEvents() }, [fetchEvents])
 
   async function handleCreate(vals) {

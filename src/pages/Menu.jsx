@@ -243,6 +243,7 @@ export default function Menu() {
     setLoading(false)
   }, [])
 
+  useEffect(() => { document.title = 'Meny — Brostein' }, [])
   useEffect(() => { fetchData() }, [fetchData])
 
   function handleCategoryDragEnd({ active, over }) {

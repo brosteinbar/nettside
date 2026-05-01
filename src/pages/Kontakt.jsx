@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import './Kontakt.css'
 
 export default function Kontakt() {
+  useEffect(() => { document.title = 'Kontakt — Brostein' }, [])
   return (
     <div className="kontakt-page">
       <main className="kontakt-main">
