@@ -10,6 +10,7 @@ const Menu        = lazy(() => import('./pages/Menu'))
 const Kontakt     = lazy(() => import('./pages/Kontakt'))
 const Admin       = lazy(() => import('./pages/Admin'))
 const Arrangement = lazy(() => import('./pages/Arrangement'))
+const Qr          = lazy(() => import('./pages/Qr'))
 
 const PageFallback = () => (
   <p style={{ textAlign: 'center', padding: '5rem 2rem', color: 'var(--fg-dim)' }}>
@@ -37,6 +38,7 @@ export default function App() {
                 <Route path="/kontakt" element={<Kontakt />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/arrangement" element={<Arrangement />} />
+                <Route path="/qr" element={<Qr />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

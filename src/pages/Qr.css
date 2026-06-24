@@ -1,0 +1,37 @@
+.qr-page {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.qr-greeting {
+  font-family: 'InterDisplay', sans-serif;
+  font-weight: 300;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+.qr-meny {
+  display: inline-block;
+  border: 1px solid var(--fg);
+  padding: 0.55rem 1.5rem;
+  font-family: 'InterDisplay', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+  letter-spacing: 0.08em;
+  color: var(--fg);
+  text-decoration: none;
+  transition: background-color 0.18s, color 0.18s;
+}
+
+.qr-meny:hover {
+  background-color: var(--fg);
+  color: var(--bg);
+}
