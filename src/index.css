@@ -69,6 +69,21 @@
   src: url('../resources/fonts/InterDisplay-ExtraBoldItalic.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'Shantell Sans';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('../resources/fonts/ShantellSans-Variable.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Shantell Sans';
+  font-style: italic;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('../resources/fonts/ShantellSans-VariableItalic.woff2') format('woff2');
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

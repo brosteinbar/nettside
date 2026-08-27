@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import './App.css'
 
 const Menu        = lazy(() => import('./pages/Menu'))
+const Vinmeny     = lazy(() => import('./pages/Vinmeny'))
 const Kontakt     = lazy(() => import('./pages/Kontakt'))
 const Admin       = lazy(() => import('./pages/Admin'))
 const Arrangement = lazy(() => import('./pages/Arrangement'))
@@ -35,6 +36,7 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/meny" element={<Menu />} />
+                <Route path="/vinmeny" element={<Vinmeny />} />
                 <Route path="/kontakt" element={<Kontakt />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/arrangement" element={<Arrangement />} />
