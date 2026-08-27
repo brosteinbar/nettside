@@ -18,6 +18,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import logoRaw from '../../resources/img/Brostein_svart.svg?raw'
 import './Menu.css'
 
 const MenuAdminContext = createContext(null)
@@ -88,13 +89,11 @@ function SortableMenuItem({ item, isDeleted }) {
       )}
       <div className="menu-item-body">
         <div className="menu-item-row">
-          <span className="menu-item-name">
-            {item.name}
-            {item.allergens && <span className="menu-item-allergens"> ({item.allergens})</span>}
-          </span>
-          {item.price != null && <span className="menu-item-price">{item.price}</span>}
+          <span className="menu-item-name">{item.name}</span>
+          {item.price != null && <span className="menu-item-price">{item.price},-</span>}
         </div>
         {item.description && <div className="menu-item-desc">{item.description}</div>}
+        {item.allergens && <div className="menu-item-allergens">{item.allergens}</div>}
       </div>
       {isAdmin && (
         <div className="admin-item-actions">
@@ -149,7 +148,6 @@ function SortableCategory({ category }) {
         {isAdmin && (
           <button className="drag-handle cat-drag-handle" {...attributes} {...listeners} aria-label="Flytt kategori">⠿</button>
         )}
-        <span className="menu-category-dash">— </span>
         {isAdmin ? (
           <input
             className="category-name-input"
@@ -161,7 +159,6 @@ function SortableCategory({ category }) {
         ) : (
           <span className="menu-category-name">{category.name}</span>
         )}
-        <span className="menu-category-dash"> —</span>
         {isAdmin && (
           <button className="btn-delete-category" onClick={() => onDeleteCategory(category.id)} title="Slett kategori" aria-label="Slett kategori">×</button>
         )}
@@ -245,6 +242,11 @@ export default function Menu() {
 
   useEffect(() => { document.title = 'Meny — Brostein' }, [])
   useEffect(() => { fetchData() }, [fetchData])
+
+  useEffect(() => {
+    document.body.classList.add('menu-page-open')
+    return () => document.body.classList.remove('menu-page-open')
+  }, [])
 
   function handleCategoryDragEnd({ active, over }) {
     if (!over || active.id === over.id) return
@@ -397,6 +399,9 @@ export default function Menu() {
   return (
     <MenuAdminContext.Provider value={adminContext}>
       <div className="menu-page">
+        <div className="menu-brand" aria-hidden="true">
+          <div className="menu-brand-logo" dangerouslySetInnerHTML={{ __html: logoRaw }} />
+        </div>
         {mutationError && <p className="form-error" style={{ textAlign: 'center', padding: '0.5rem 0' }}>{mutationError}</p>}
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
           <SortableContext items={categories.map(c => `cat-${c.id}`)} strategy={rectSortingStrategy}>
