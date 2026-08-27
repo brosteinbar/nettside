@@ -148,6 +148,12 @@ body.menu-page-open {
   flex-shrink: 0;
 }
 
+.wine-vintage {
+  font-weight: 400;
+  opacity: 0.75;
+  font-size: 0.9em;
+}
+
 .menu-item-desc {
   font-family: 'Providence Sans Pro', 'FF Providence Sans Pro', 'FF Providence Sans', 'Shantell Sans', 'InterVariable', sans-serif;
   font-weight: 350;
@@ -347,6 +353,50 @@ body.menu-page-open {
 
 .btn-add-category:hover { color: var(--menu-red); border-color: var(--menu-red); }
 
+/* ── Admin visibility toggle ─────────────────────────────────────── */
+
+.menu-visibility-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed var(--menu-red-dim);
+  border-radius: 1px;
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--menu-red);
+}
+
+.menu-visibility-bar button {
+  background: none;
+  border: 1px solid var(--menu-red-dim);
+  border-radius: 1px;
+  cursor: pointer;
+  padding: 0.25rem 0.75rem;
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.75rem;
+  color: var(--menu-red);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.menu-visibility-bar button:hover { border-color: var(--menu-red); }
+
+/* ── Empty state ─────────────────────────────────────────────────── */
+
+.menu-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  font-family: 'Providence Sans Pro', 'FF Providence Sans Pro', 'FF Providence Sans', 'Shantell Sans', 'InterVariable', sans-serif;
+  font-weight: 350;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  color: var(--menu-red);
+  opacity: 0.8;
+}
+
 /* ── Loading ─────────────────────────────────────────────────────── */
 
 .menu-loading {
@@ -396,6 +446,7 @@ body.menu-page-open {
   .drag-handle,
   .admin-item-actions,
   .admin-footer,
+  .menu-visibility-bar,
   .btn-add-item,
   .btn-delete-category,
   .deleted-items-section,

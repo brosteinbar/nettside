@@ -8,6 +8,7 @@ import './Navbar.css'
 const MENU_ITEMS = [
   { label: 'Hjem',        href: '/' },
   { label: 'Meny',        href: '/meny' },
+  { label: 'Vinmeny',     href: '/vinmeny' },
   { label: 'Arrangement', href: '/arrangement' },
   { label: 'Kontakt',     href: '/kontakt' },
 ]
