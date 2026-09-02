@@ -106,6 +106,7 @@
 .nav-admin-row {
   display: flex;
   justify-content: flex-end;
+  gap: 1.25rem;
   padding: 0.75rem 2rem 2rem;
   border-top: 1px solid rgba(10, 9, 8, 0.12);
   margin-top: 0.5rem;
@@ -120,6 +121,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   padding: 0;
+  text-decoration: none;
   transition: color 0.2s ease;
 }
 

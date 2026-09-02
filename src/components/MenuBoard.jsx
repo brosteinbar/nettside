@@ -210,8 +210,7 @@ function SortableCategory({ category }) {
 
 export default function MenuBoard({ config }) {
   const { categoriesTable, itemsTable, menuKey, pageTitle, fields, renderItemBody, emptyLabel } = config
-  const { user } = useAuth()
-  const isAdmin = !!user
+  const { isAdmin } = useAuth()
 
   const [categories, setCategories] = useState([])
   const [visible, setVisible] = useState(true)

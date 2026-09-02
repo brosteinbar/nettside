@@ -192,8 +192,7 @@ function EventCard({ event, isAdmin, onEdit, onDelete, isPast, isWeekEnd }) {
 }
 
 export default function Arrangement() {
-  const { user } = useAuth()
-  const isAdmin = !!user
+  const { isAdmin } = useAuth()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState(null)

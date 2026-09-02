@@ -1,0 +1,148 @@
+.timeadmin {
+  margin-top: 3rem;
+  border-top: 1px solid var(--fg-dim);
+  padding-top: 1.5rem;
+}
+
+.timeadmin-heading {
+  font-family: 'InterDisplay', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  margin: 1.75rem 0 0.6rem;
+}
+
+.timeadmin-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.timeadmin-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(10, 9, 8, 0.12);
+}
+
+.timeadmin-row > span:first-child { flex: 1; }
+
+.timeadmin-pin {
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-dim);
+  letter-spacing: 0.15em;
+}
+
+.timeadmin button {
+  background: transparent;
+  border: 1px solid var(--fg-dim);
+  color: var(--fg);
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+  transition: border-color 0.1s;
+}
+
+.timeadmin button:hover { border-color: var(--fg); }
+.timeadmin button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.timeadmin-add {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  align-items: flex-end;
+}
+
+.timeadmin-add input,
+.timeadmin-filters select,
+.timeadmin-filters input,
+.timeadmin-editor input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--fg-dim);
+  font-family: 'InterVariable', sans-serif;
+  font-size: 0.85rem;
+  color: var(--fg);
+  padding: 0.35rem 0;
+}
+
+.timeadmin-add input:focus,
+.timeadmin-filters select:focus,
+.timeadmin-filters input:focus,
+.timeadmin-editor input:focus {
+  outline: none;
+  border-bottom-color: var(--fg);
+}
+
+.timeadmin-add input::placeholder,
+.timeadmin-editor input::placeholder {
+  color: var(--fg-dim);
+}
+
+.timeadmin-add input { flex: 1; }
+
+.timeadmin-badge {
+  font-size: 0.7rem;
+  color: var(--error);
+  border: 1px solid var(--error);
+  padding: 0.1rem 0.4rem;
+  white-space: nowrap;
+}
+
+.timeadmin-times {
+  color: var(--fg-dim);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+}
+
+.timeadmin-filters {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.timeadmin-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem 0 1rem;
+}
+
+.timeadmin-editor-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.timeadmin-editor-row label {
+  width: 2.2rem;
+  font-size: 0.8rem;
+  color: var(--fg-dim);
+}
+
+.timeadmin-editor-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.timeadmin-corrections {
+  list-style: none;
+  margin: 0.25rem 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--fg-dim);
+  border-left: 2px solid var(--fg-dim);
+}
+
+.timeadmin-corrections li { padding: 0.15rem 0; }
+
+.timeadmin-corrections-empty {
+  margin: 0.25rem 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--fg-dim);
+  border-left: 2px solid var(--fg-dim);
+}

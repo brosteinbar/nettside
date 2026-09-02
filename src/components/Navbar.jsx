@@ -84,6 +84,9 @@ export default function Navbar() {
           </ul>
           {user && (
             <div className="nav-admin-row">
+              <Link className="nav-admin-btn" to="/timestempling" onClick={close}>
+                Timestempling
+              </Link>
               <button className="nav-admin-btn" onClick={handleSignOut}>
                 Logg ut
               </button>
