@@ -16,7 +16,7 @@ export function useLoginForm(onSuccess) {
     if (error) {
       setError('Feil e-post eller passord.')
     } else {
-      onSuccess()
+      onSuccess?.()
     }
   }
 

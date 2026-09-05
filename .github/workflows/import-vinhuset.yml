@@ -1,0 +1,42 @@
+name: Import Vinhuset catalog
+
+on:
+  schedule:
+    - cron: '0 3 * * *'          # nightly 03:00 UTC (05:00 Oslo in summer, 04:00 in winter)
+  workflow_dispatch:
+    inputs:
+      producer:
+        description: 'Only re-import this producer (exact name as in Vinhuset)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Fetch and map only, write nothing to Supabase'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: import-vinhuset
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: node scripts/import-vinhuset.mjs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PRODUCER: ${{ inputs.producer }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          TRIGGER_SOURCE: ${{ github.event_name }}

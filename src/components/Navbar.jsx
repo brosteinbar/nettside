@@ -20,7 +20,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isTouch, setIsTouch] = useState(matchesTouch)
   const headerRef = useRef(null)
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const close = () => setIsOpen(false)
 
   useEffect(() => {
@@ -87,6 +87,11 @@ export default function Navbar() {
               <Link className="nav-admin-btn" to="/timestempling" onClick={close}>
                 Timestempling
               </Link>
+              {isAdmin && (
+                <Link className="nav-admin-btn" to="/produktsok" onClick={close}>
+                  Produktsøk
+                </Link>
+              )}
               <button className="nav-admin-btn" onClick={handleSignOut}>
                 Logg ut
               </button>

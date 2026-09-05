@@ -1,0 +1,31 @@
+.psok-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+.psok-title {
+  font-family: 'InterDisplay', sans-serif;
+  font-weight: 300;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+}
+
+.psok-denied {
+  color: var(--fg-dim);
+  font-size: 0.9rem;
+}
+
+/* ── login (not signed in) ── */
+
+.psok-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--nav-height));
+}
+
+.psok-login-box { width: min(360px, 90vw); }
+.psok-login-box .admin-form input { padding: 0.5rem 0; }
+.psok-login-box .admin-submit { width: 100%; }
