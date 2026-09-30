@@ -15,7 +15,7 @@ export default function Admin() {
       <div className="admin-page">
         <div className="admin-box">
           <p className="admin-logged-in">Logget inn som {user.email}</p>
-          <button className="admin-submit" onClick={() => supabase.auth.signOut()}>
+          <button className="admin-submit" onClick={() => supabase.auth.signOut({ scope: 'local' })}>
             Logg ut
           </button>
         </div>

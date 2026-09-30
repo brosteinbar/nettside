@@ -52,7 +52,9 @@ export default function Navbar() {
   }, [isOpen])
 
   function handleSignOut() {
-    supabase.auth.signOut().catch(err => console.error('Sign out failed:', err))
+    // Local scope: only sign out this device. The default (global) revokes every
+    // session for the account, which also kicks out the shared bar iPad.
+    supabase.auth.signOut({ scope: 'local' }).catch(err => console.error('Sign out failed:', err))
     close()
   }
 
