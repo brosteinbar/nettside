@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 import Home from './pages/Home'
 import './App.css'
 
@@ -49,6 +50,7 @@ export default function App() {
               </Routes>
             </Suspense>
           </ErrorBoundary>
+          <Footer />
         </div>
       </HashRouter>
     </AuthProvider>

@@ -1,0 +1,17 @@
+.site-footer {
+  margin-top: auto;
+  min-height: var(--footer-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 2rem;
+  text-align: center;
+}
+
+.site-footer p {
+  font-family: 'InterDisplay', sans-serif;
+  font-weight: 200;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  letter-spacing: 0.03em;
+  color: var(--fg);
+}
