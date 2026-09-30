@@ -16,6 +16,14 @@ const MENU_ITEMS = [
 const matchesTouch = () =>
   typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
 
+// True when launched from a home screen icon (iOS "Add to Home Screen" or an
+// installed PWA). The staff pages are deliberately unlinked on the public site,
+// but the installed app is only ever on staff devices, so it may link to them.
+// Display mode is fixed for the lifetime of the page, so evaluate it once.
+const IS_STANDALONE =
+  typeof window !== 'undefined' &&
+  (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isTouch, setIsTouch] = useState(matchesTouch)
@@ -84,7 +92,7 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
-          {user && (
+          {(user || IS_STANDALONE) && (
             <div className="nav-admin-row">
               <Link className="nav-admin-btn" to="/timestempling" onClick={close}>
                 Timestempling
@@ -94,9 +102,11 @@ export default function Navbar() {
                   Produktsøk
                 </Link>
               )}
-              <button className="nav-admin-btn" onClick={handleSignOut}>
-                Logg ut
-              </button>
+              {user && (
+                <button className="nav-admin-btn" onClick={handleSignOut}>
+                  Logg ut
+                </button>
+              )}
             </div>
           )}
         </div>
