@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import './TimeAdmin.css'
 
 const OPEN_LIMIT_MS = 12 * 60 * 60 * 1000
+const PAGE_SIZE = 20
 
 const pad2 = n => String(n).padStart(2, '0')
 
@@ -137,6 +138,8 @@ export default function TimeAdmin({ onEntriesChanged }) {
   const [employees, setEmployees] = useState([])
   const [openEntries, setOpenEntries] = useState([])
   const [history, setHistory] = useState([])
+  const [historyCount, setHistoryCount] = useState(0)
+  const [page, setPage] = useState(0)
   const [corrections, setCorrections] = useState({})
   const [expandedId, setExpandedId] = useState(null)
   const [editingId, setEditingId] = useState(null)
@@ -151,6 +154,9 @@ export default function TimeAdmin({ onEntriesChanged }) {
     return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-01`
   })
   const [filterTo, setFilterTo] = useState(() => toDateInput(new Date()))
+
+  // Changing a filter always jumps back to the first page.
+  const changeFilter = setter => e => { setter(e.target.value); setPage(0) }
 
   const fetchEmployees = useCallback(async () => {
     const { data, error: err } = await supabase.from('employees').select('*').order('name')
@@ -173,17 +179,28 @@ export default function TimeAdmin({ onEntriesChanged }) {
     const fromISO = new Date(`${filterFrom}T00:00`).toISOString()
     const toExclusive = new Date(`${filterTo}T00:00`)
     toExclusive.setDate(toExclusive.getDate() + 1)
+    const offset = page * PAGE_SIZE
     let query = supabase
       .from('time_entries')
-      .select('*, employees(name)')
+      .select('*, employees(name)', { count: 'exact' })
       .gte('clock_in', fromISO)
       .lt('clock_in', toExclusive.toISOString())
       .order('clock_in', { ascending: false })
+      .range(offset, offset + PAGE_SIZE - 1)
     if (filterEmployee) query = query.eq('employee_id', filterEmployee)
-    const { data, error: err } = await query
-    if (err) { setError('Kunne ikke laste historikk.'); return }
+    const { data, count, error: err } = await query
+    if (err) {
+      // PGRST103: requested range lies beyond the total — the rows on this page are gone.
+      if (err.code === 'PGRST103' && page > 0) { setPage(0); return }
+      setError('Kunne ikke laste historikk.')
+      return
+    }
+    const total = count ?? 0
+    const lastPage = Math.max(0, Math.ceil(total / PAGE_SIZE) - 1)
+    if (page > lastPage) { setPage(lastPage); return }
     setHistory(data ?? [])
-  }, [filterEmployee, filterFrom, filterTo])
+    setHistoryCount(total)
+  }, [filterEmployee, filterFrom, filterTo, page])
 
   useEffect(() => { fetchEmployees(); fetchOpen() }, [fetchEmployees, fetchOpen])
   useEffect(() => { fetchHistory() }, [fetchHistory])
@@ -297,7 +314,7 @@ export default function TimeAdmin({ onEntriesChanged }) {
         <select
           aria-label="Ansatt"
           value={filterEmployee}
-          onChange={e => setFilterEmployee(e.target.value)}
+          onChange={changeFilter(setFilterEmployee)}
         >
           <option value="">Alle ansatte</option>
           {employees.map(emp => (
@@ -306,8 +323,8 @@ export default function TimeAdmin({ onEntriesChanged }) {
             </option>
           ))}
         </select>
-        <input type="date" aria-label="Fra dato" value={filterFrom} onChange={e => setFilterFrom(e.target.value)} />
-        <input type="date" aria-label="Til dato" value={filterTo} onChange={e => setFilterTo(e.target.value)} />
+        <input type="date" aria-label="Fra dato" value={filterFrom} onChange={changeFilter(setFilterFrom)} />
+        <input type="date" aria-label="Til dato" value={filterTo} onChange={changeFilter(setFilterTo)} />
       </div>
       <ul className="timeadmin-list">
         {history.map(entry => (
@@ -317,6 +334,20 @@ export default function TimeAdmin({ onEntriesChanged }) {
           <li className="stempel-empty">Ingen stemplinger i valgt periode.</li>
         )}
       </ul>
+      {historyCount > PAGE_SIZE && (
+        <nav className="timeadmin-pagination" aria-label="Sider i historikk">
+          <button onClick={() => setPage(p => p - 1)} disabled={page === 0}>Forrige</button>
+          <span>
+            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, historyCount)} av {historyCount}
+          </span>
+          <button
+            onClick={() => setPage(p => p + 1)}
+            disabled={(page + 1) * PAGE_SIZE >= historyCount}
+          >
+            Neste
+          </button>
+        </nav>
+      )}
     </section>
   )
 }
