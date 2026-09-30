@@ -7,7 +7,13 @@ export default function Qr() {
   return (
     <main className="qr-page">
       <p className="qr-greeting">Kom inn, vi biter ikke! :)</p>
-      <Link className="qr-meny" to="/meny">meny</Link>
+      <Link
+        className="qr-meny"
+        to="/meny"
+        onClick={() => window.umami?.track('qr-meny')}
+      >
+        meny
+      </Link>
     </main>
   )
 }

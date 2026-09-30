@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import Analytics from './components/Analytics'
 import Home from './pages/Home'
 import './App.css'
 
@@ -34,6 +35,7 @@ export default function App() {
       <HashRouter>
         <div className="app">
           <Navbar />
+          <Analytics />
           <ErrorBoundary>
             <Suspense fallback={<PageFallback />}>
               <Routes>
